@@ -10,6 +10,8 @@
  * @class SpRestApi
  * @typedef {Object} SpRestApi
  * @constructor
+ * @param {SpRestApiOptions} [options] - The optional settings to override the
+ *      defaults.
  */
 var SpRestApi = function (options) {
     /**
@@ -102,7 +104,7 @@ SpRestApi.prototype.lists = function (listTitle) {
  *      where each field will override a default setting in `.defaultOptions`.
  * @returns {SpRestApi} This SpRestApi instance.
  */
-SpRestApi.prototype.options = function (options) {
+SpRestApi.prototype.config = function (options) {
     // Merge the specified options with the default options
     this.options = $.extend(this.defaultOptions, options);
     return this;
@@ -112,13 +114,15 @@ SpRestApi.prototype.options = function (options) {
  * Adds the $top= string to the specified URL, to limit the max number of
  * items in the response.
  * @param {string} url - the URL to add the $top string to.
+ * @returns {string} The URL with the added "?"/"&" character and the $top=
+ *      URL parameter.
  */
 SpRestApi.prototype.addMaxItems = function (url) {
     // Add '?' or '&' to URL query string
     url += url.includes('?') ? '&' : '?';
 
     return url + "$top=" + this.options.maxItems;
-}
+};
 
 /**
  * Returns all items from a list, or all items up to the SharePoint limit
@@ -127,6 +131,20 @@ SpRestApi.prototype.addMaxItems = function (url) {
 SpRestApi.prototype.getAllItems = function () {
     var url = this.options.siteUrl +
         this.options.urls.list.format(this.options.listTitle);
+    url = this.addMaxItems(url);
+    this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
+};
+
+/**
+ * Returns a single item from a list.
+ * @param {number} itemId - The SharePoint list item ID of the item we need to
+ *      fetch.
+ */
+SpRestApi.prototype.getItem = function (itemId) {
+    if (!itemId) { throw "The list item ID must not be empty."; }
+
+    var url = this.options.siteUrl +
+        this.options.urls.item.format(this.options.listTitle, itemId);
     this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
 };
 
@@ -141,7 +159,6 @@ SpRestApi.prototype.getAllItems = function () {
  * @param {Function} error - Callback for failed REST API call.
  */
 SpRestApi.prototype.loadUrl = function (url, method, success, error) {
-    url = this.addMaxItems(url);
     $.ajax({
         url: url,
         type: method,
