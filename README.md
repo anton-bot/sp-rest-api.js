@@ -20,7 +20,6 @@ api.lists('Projects').getAllItems();
 ```
 // Read a single SharePoint list item, and run a callback
 // after success or error.
-var api = new SpRestApi();
 var options = {
     listTitle: 'Projects',
     onsuccess: function(data) {
@@ -30,7 +29,8 @@ var options = {
         alert('Error!');
     },
 };
-api.config(options).getItem(123);
+var api = new SpRestApi(options);
+api.getItem(123);
 ```
 
 
