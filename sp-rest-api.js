@@ -20,6 +20,7 @@ var SpRestApi = function () {
  *      requests to SharePoint REST API.
  * @property {Function} [onerror] - The callback function for failed requests
  *      to SharePoint REST API.
+ * @property {string} [listTitle] - The display name of the SharePoint list.
  * @property {number} [maxItems] - The maximum number of items to be returned
  *      from the list. If `recursiveFetch` is set to true, this is the
  *      maximum number of items to fetch on each request to server. If not
@@ -31,6 +32,10 @@ var SpRestApi = function () {
  *      per call.
  * @property {string} [verbosity] - The amount of metadata to be returned
  *      in the JSON response from server. Use the SpRestApi.Verbosity enum.
+ * @property {string} [siteUrl] - The SharePoint site URL which is usually
+ *      obtained from the _spPageContextInfo.webAbsoluteUrl.
+ * @property {Array.<string>} [urls] - The URLs of various API calls, e.g. to
+ *      get a list item, all items in a list etc.
  */
 
 /**
@@ -40,9 +45,15 @@ var SpRestApi = function () {
 SpRestApi.prototype.defaultOptions = {
     onsuccess: console.log,
     onerror: console.log,
+    listTitle: '',
     maxItems: 5000, 
     recursiveFetch: true,
     verbosity: SpRestApi.Verbosity.COMPACT,
+    siteUrl: _spPageContextInfo.webAbsoluteUrl,
+    urls: {
+        list: '/_api/web/lists/getbytitle(\'{0}\')/items',
+        item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
+    },
 };
 
 /**
@@ -70,16 +81,19 @@ SpRestApi.prototype.Verbosity = {
 SpRestApi.prototype.lists = function (listTitle) {
     this.listTitle = listTitle;
     return this;
-}
+};
 
 /**
  * Sets the SpRestApiOptions. If not called, before the request to server,
  * the default options will be used.
- * @param {SpRestApiOptions} options
+ * @param {SpRestApiOptions} options - The partial SpRestApiOptions object,
+ *      where each field will override a default setting in `.defaultOptions`.
+ * @returns {SpRestApi} This SpRestApi instance.
  */
 SpRestApi.prototype.options = function (options) {
     // Merge the specified options with the default options
     this.options = $.extend(this.defaultOptions, options);
+    return this;
 };
 
 /**
@@ -87,21 +101,28 @@ SpRestApi.prototype.options = function (options) {
  * or the limit specified in the options.
  */
 SpRestApi.prototype.getAllItems = function () {
-
+    var url = this.options.urls.list.format(this.options.listTitle);
+    this.loadUrl(url, 'GET', options.onsuccess, options.onerror);
 };
 
 /**
  * A generic function to call any URL of the SharePoint REST API. Usually
- * there is no need to call this method directly. 
+ * there is no need to call this method directly.
+ * @param {string} url - The URL of the SharePoint REST API to be queried. Will
+ *      not be modified by this method.
+ * @param {string} method - HTTP method for this request, e.g. 'GET', 'POST',
+ *      'DELETE'.
+ * @param {Function} success - Callback for successfull REST API call.
+ * @param {Function} error - Callback for failed REST API call.
  */
-SpRestApi.prototype.loadUrl: function (url, method, success, error) {
+SpRestApi.prototype.loadUrl = function (url, method, success, error) {
     $.ajax({
         url: url,
         type: method,
         cache: false,
-        contentType: "application/json; odata=verbose",
+        contentType: this.options.verbosity,
         headers: {
-            "Accept": "application/json; odata=verbose",
+            "Accept": this.options.verbosity,
             "X-RequestDigest":
                 document.getElementById("__REQUESTDIGEST").value // TODO FIXME get via a separate function or property
         },
