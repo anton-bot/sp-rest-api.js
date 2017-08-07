@@ -5,12 +5,52 @@
  */
 
 /**
+ * Initializes a new instance of the SpRestApi class, which contains methods
+ * for calling the SharePoint REST API.
  * @class SpRestApi
  * @typedef {Object} SpRestApi
- * Contains methods for calling the SharePoint REST API.
+ * @constructor
  */
-var SpRestApi = function () {
+var SpRestApi = function (options) {
+    /**
+     * The default options that will be used unless overridden.
+     * @type {SpRestApiOptions}
+     */
+    this.defaultOptions = {
+        onsuccess: console.log,
+        onerror: console.log,
+        listTitle: '',
+        maxItems: 100,
+        recursiveFetch: true,
+        verbosity: SpRestApi.Verbosity.VERBOSE,
+        siteUrl: _spPageContextInfo.webAbsoluteUrl,
+        urls: {
+            list: '/_api/web/lists/getbytitle(\'{0}\')/items',
+            item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
+        },
+    };
 
+    this.options = $.extend(this.defaultOptions, options);
+};
+
+/**
+ * Determines the amount of metadata in the response JSON from server.
+ * For most cases, 'COMPACT' should be enough.
+ * @readonly
+ * @enum {string}
+ * @typedef Verbosity
+ */
+SpRestApi.Verbosity = {
+    /** Values are placed in `.value`. Less metadata. 
+        Not supported in SP 2013 and earlier. */
+    COMPACT: 'application/json;odata=nometadata',
+
+    /** Value are placed in `.value`. Moderate metadata. 
+        Not supported in SP 2013 and earlier. */
+    MINIMAL: 'application/json;odata=minimalmetadata',
+
+    /** Values are placed in `.d.results`. More metadata. */
+    VERBOSE: 'application/json;odata=verbose',
 };
 
 /**
@@ -37,39 +77,11 @@ var SpRestApi = function () {
  * @property {Array.<string>} [urls] - The URLs of various API calls, e.g. to
  *      get a list item, all items in a list etc.
  */
-
 /**
- * The default options that will be used unless overridden.
+ * Stores this instance's options.
  * @type {SpRestApiOptions}
  */
-SpRestApi.prototype.defaultOptions = {
-    onsuccess: console.log,
-    onerror: console.log,
-    listTitle: '',
-    maxItems: 5000, 
-    recursiveFetch: true,
-    verbosity: SpRestApi.Verbosity.COMPACT,
-    siteUrl: _spPageContextInfo.webAbsoluteUrl,
-    urls: {
-        list: '/_api/web/lists/getbytitle(\'{0}\')/items',
-        item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
-    },
-};
-
-/**
- * Determines the amount of metadata in the response JSON from server.
- * For most cases, 'COMPACT' should be enough.
- * @readonly
- * @enum {string}
- * @typedef Verbosity
- */
-SpRestApi.prototype.Verbosity = {
-    /** Values are placed in `.value`. Less metadata. */
-    COMPACT: 'application/json; odata=nometadata',
-
-    /** Values are placed in `.d`. More metadata. */
-    VERBOSE: 'application/json; odata=verbose',
-};
+SpRestApi.prototype.options = {};
 
 /**
  * Sets the list title (list display name) of this SpRestApi instance.
@@ -79,7 +91,7 @@ SpRestApi.prototype.Verbosity = {
  * @returns {SpRestApi} Returns the instance of this SpRestApi object.
  */
 SpRestApi.prototype.lists = function (listTitle) {
-    this.listTitle = listTitle;
+    this.options.listTitle = listTitle;
     return this;
 };
 
@@ -97,12 +109,25 @@ SpRestApi.prototype.options = function (options) {
 };
 
 /**
+ * Adds the $top= string to the specified URL, to limit the max number of
+ * items in the response.
+ * @param {string} url - the URL to add the $top string to.
+ */
+SpRestApi.prototype.addMaxItems = function (url) {
+    // Add '?' or '&' to URL query string
+    url += url.includes('?') ? '&' : '?';
+
+    return url + "$top=" + this.options.maxItems;
+}
+
+/**
  * Returns all items from a list, or all items up to the SharePoint limit
  * or the limit specified in the options.
  */
 SpRestApi.prototype.getAllItems = function () {
-    var url = this.options.urls.list.format(this.options.listTitle);
-    this.loadUrl(url, 'GET', options.onsuccess, options.onerror);
+    var url = this.options.siteUrl +
+        this.options.urls.list.format(this.options.listTitle);
+    this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
 };
 
 /**
@@ -116,6 +141,7 @@ SpRestApi.prototype.getAllItems = function () {
  * @param {Function} error - Callback for failed REST API call.
  */
 SpRestApi.prototype.loadUrl = function (url, method, success, error) {
+    url = this.addMaxItems(url);
     $.ajax({
         url: url,
         type: method,
@@ -134,3 +160,40 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error) {
         },
     });
 };
+
+
+
+/* Polyfills
+-----------------------------*/
+
+if (!String.prototype.format) {
+    /**
+    * Replaces symbols like {0}, {1} in a string with the values from
+    * the arguments.
+    * @returns {string} The string with the replaced placeholders.
+    */
+    String.prototype.format = function () {
+        var args = arguments;
+        return this.replace(/{(\d+)}/g, function (match, number) {
+            return typeof args[number] !== 'undefined'
+                ? args[number]
+                : match
+                ;
+        });
+    };
+}
+
+if (!String.prototype.includes) {
+    String.prototype.includes = function (search, start) {
+        'use strict';
+        if (typeof start !== 'number') {
+            start = 0;
+        }
+
+        if (start + search.length > this.length) {
+            return false;
+        } else {
+            return this.indexOf(search, start) !== -1;
+        }
+    };
+}
