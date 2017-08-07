@@ -30,7 +30,7 @@ var options = {
         alert('Error!');
     },
 };
-api.options(options).getItem(123);
+api.config(options).getItem(123);
 ```
 
 
