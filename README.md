@@ -57,7 +57,7 @@ Just place `sp-rest-api.js` into any folder on the site, e.g. into `/SiteAssets`
 <script src='../SiteAssets/sp-rest-api.js'></script>
 ```
 
-If using inside a SharePoint page, the `<script>` tag must be placed after SharePoint's `<input id="__REQUESTDIGEST" type="hidden">` tag.
+If using inside a SharePoint page, the `<script>` tag cannot be placed after SharePoint's `<input id="__REQUESTDIGEST" type="hidden">` tag, otherwise you will need to run `refreshDigest()` manually to get the SP authorization token.
 
 ### Full reference
 
