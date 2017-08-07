@@ -39,6 +39,16 @@ api.getItem(123);
 - jQuery 1+
 - SharePoint 2013, 2016 or online
 
+If using this library in a non-SharePoint page (e.g. a normal HTML file), you need to specify the `siteUrl` option when initializing the `SpRestApi`, and then run `refreshDigest()` to get the authorization token. Until `refreshDigest()` completes successfully, all SharePoint API calls will fail.
+
+```
+var options = {
+    siteUrl: 'http://sharepoint.example.com/sites/mysite',
+};
+var api = new SpRestApi(options);
+api.refreshDigest(initializePage); // Insert your callback function here
+```
+
 ### Setup
 
 Just place `sp-rest-api.js` into any folder on the site, e.g. into `/SiteAssets`, and include it after the jQuery and SP JavaScript files:
@@ -46,6 +56,8 @@ Just place `sp-rest-api.js` into any folder on the site, e.g. into `/SiteAssets`
 ```
 <script src='../SiteAssets/sp-rest-api.js'></script>
 ```
+
+If using inside a SharePoint page, the `<script>` tag cannot be placed after SharePoint's `<input id="__REQUESTDIGEST" type="hidden">` tag, otherwise you will need to run `refreshDigest()` manually to get the SP authorization token.
 
 ### Full reference
 
@@ -64,7 +76,7 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 
 #### Utilities
 
-- `refreshDigest()` - refreshes the SharePoint security validation.
+- `refreshDigest()` - gets a new the SharePoint security validation / token, and stores it in the `options`.
 
 #### Other/internal methods
 
