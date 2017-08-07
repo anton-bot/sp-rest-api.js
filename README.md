@@ -56,6 +56,7 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 #### Initialization
 - `new SpRestApi()` - create new instance, set options
 - `config()` - set options after the object was created
+- `lists()` - sets the list name only (can also be set via `config()`)
 
 #### SharePoint Lists
 - `getAllItems()` - fetch all items from a list
