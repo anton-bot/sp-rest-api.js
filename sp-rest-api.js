@@ -16,20 +16,20 @@ var SpRestApi = function () {
 /**
  * @typedef {Object} SpRestApiOptions - The options passed to methods
  *      inside the SpRestApi class.
- * @property {Function} onsuccess - The callback function for successful
+ * @property {Function} [onsuccess] - The callback function for successful
  *      requests to SharePoint REST API.
- * @property {Function} onerror - The callback function for failed requests
+ * @property {Function} [onerror] - The callback function for failed requests
  *      to SharePoint REST API.
- * @property {number} maxItems - The maximum number of items to be returned
+ * @property {number} [maxItems] - The maximum number of items to be returned
  *      from the list. If `recursiveFetch` is set to true, this is the
  *      maximum number of items to fetch on each request to server. If not
  *      not specified, defaults to SharePoint's limit of 100. Maximum is
  *      5000 due to SharePoint limitations.
- * @property {boolean} recursiveFetch - Fetch all items from the list by
+ * @property {boolean} [recursiveFetch] - Fetch all items from the list by
  *      repeatedly making server requests until all list items are fetched.
  *      This is to overcome SharePoint's limitation of maximum 5000 items
  *      per call.
- * @property {string} verbosity - The amount of metadata to be returned
+ * @property {string} [verbosity] - The amount of metadata to be returned
  *      in the JSON response from server. Use the SpRestApi.Verbosity enum.
  */
 
@@ -78,8 +78,8 @@ SpRestApi.prototype.lists = function (listTitle) {
  * @param {SpRestApiOptions} options
  */
 SpRestApi.prototype.options = function (options) {
-    // TODO FIXME merge with default options
-    this.options = options;
+    // Merge the specified options with the default options
+    this.options = $.extend(this.defaultOptions, options);
 };
 
 /**
