@@ -25,7 +25,9 @@ var SpRestApi = function (options) {
         maxItems: 100,
         recursiveFetch: true,
         verbosity: SpRestApi.Verbosity.VERBOSE,
-        siteUrl: _spPageContextInfo.webAbsoluteUrl,
+        siteUrl: _spPageContextInfo ? _spPageContextInfo.webAbsoluteUrl : '',
+        token: document.getElementById("__REQUESTDIGEST") ? 
+            document.getElementById("__REQUESTDIGEST").value : '',
         urls: {
             list: '/_api/web/lists/getbytitle(\'{0}\')/items',
             item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
@@ -58,6 +60,9 @@ SpRestApi.Verbosity = {
 /**
  * @typedef {Object} SpRestApiOptions - The options passed to methods
  *      inside the SpRestApi class.
+ * @property {string} [token] - The SharePoint's request digest, a token that
+ *      it is required for every API call. Required only if using outside a
+ *      SharePoint page, otherwise it is obtained automatically from DOM.
  * @property {Function} [onsuccess] - The callback function for successful
  *      requests to SharePoint REST API.
  * @property {Function} [onerror] - The callback function for failed requests
@@ -75,7 +80,8 @@ SpRestApi.Verbosity = {
  * @property {string} [verbosity] - The amount of metadata to be returned
  *      in the JSON response from server. Use the SpRestApi.Verbosity enum.
  * @property {string} [siteUrl] - The SharePoint site URL which is usually
- *      obtained from the _spPageContextInfo.webAbsoluteUrl.
+ *      obtained from the _spPageContextInfo.webAbsoluteUrl. Required if using
+ *      this library outside of a SharePoint page.
  * @property {Array.<string>} [urls] - The URLs of various API calls, e.g. to
  *      get a list item, all items in a list etc.
  */
@@ -166,8 +172,7 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error) {
         contentType: this.options.verbosity,
         headers: {
             "Accept": this.options.verbosity,
-            "X-RequestDigest":
-                document.getElementById("__REQUESTDIGEST").value // TODO FIXME get via a separate function or property
+            "X-RequestDigest": this.options.token,
         },
         success: function (data) {
             success(data);
@@ -178,6 +183,44 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error) {
     });
 };
 
+/**
+ * Sends a request to SharePoint to get the SharePoint authorization token,
+ * which is required for all data requests. This is necessary in two cases:
+ * - We are loading this script from a non-SharePoint page (e.g. normal HTML);
+ * - We are refreshing the token (which expires after 30 minutes).
+ * @param {Function} callback - The callback to run after the authorization
+ *      token is received successfully.
+ */
+SpRestApi.prototype.refreshDigest = function (callback) {
+    var url = this.siteUrl + '/_api/contextinfo';
+
+    // If request succeeded:
+    var success = function (data) {
+        if (data && data.d && data.d.GetContextWebInformation &&
+            data.d.GetContextWebInformation.FormDigestValue) {
+            // If Verbosity = odata=verbose:
+            this.options = data.d.GetContextWebInformation.FormDigestValue;
+
+        } else if (data && data.value && data.value.GetContextWebInformation &&
+            data.value.GetContextWebInformation.FormDigestValue) { // TODO FIXME need to verify this path is correct in SP online
+            // If Verbosity = odata=nometadata, odata=minimalmetadata:
+            this.options = data.value.GetContextWebInformation.FormDigestValue;
+        } else {
+            throw 'Unable to obtain SharePoint authorization token.';
+        }
+
+        if (typeof callback === 'function') {
+            callback();
+        }
+    };
+
+    // If request failed:
+    var error = function () {
+        throw 'Unable to obtain SharePoint authorization token';
+    };
+
+    this.loadUrl(url, 'POST', success, error);
+};
 
 
 /* Polyfills
