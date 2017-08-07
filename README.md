@@ -47,6 +47,29 @@ Just place `sp-rest-api.js` into any folder on the site, e.g. into `/SiteAssets`
 <script src='../SiteAssets/sp-rest-api.js'></script>
 ```
 
+### Full reference
+
+This library is now in development. Target completion date: end of August 2017.
+
+See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRestApi.html) for full description of methods and options.
+
+#### Initialization
+- `new SpRestApi()` - create new instance, set options
+- `config()` - set options after the object was created
+
+#### SharePoint Lists
+- `getAllItems()` - fetch all items from a list
+- `getItem()` - fetch a single item from the list
+
+#### Utilities
+
+- `refreshDigest()` - refreshes the SharePoint security validation.
+
+#### Other/internal methods
+
+- `addMaxItems` - adds `$top` parameter to URL.
+- `loadUrl()` - fetches the specified URL.
+
 ### License
 
 MIT. Do whatever you want.
