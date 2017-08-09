@@ -276,6 +276,36 @@ SpRestApi.prototype.deleteItem = function (itemId) {
 };
 
 /**
+ * Generates the ListItemType which is required by SharePoint when creating a
+ * new list item. It is based on the list name where characters such as spaces
+ * are replaced with sequences like _x0020_.
+ * @param {string} listTitle - The display name of the list where we are
+ *      creating the new list item.
+ * @static
+ */
+SpRestApi.getListItemType = function (listTitle) {
+    var type = "SP.Data." + listTitle.capitalize() + "ListItem";
+    return SpRestApi.replaceSharepointSpecialChars(type);
+}
+
+/**
+ * Replaces Replaces special characters (like underscores and spaces) that
+ * cannot be used in SharePoint list names because SharePoint changes them to 
+ * escape sequences, as seen in the function.
+ * @param {string} inputString - A string that may contain an underscore or a
+ *      space, which will be replaced.
+ * @returns {string} The string that is safe to use in SharePoint list item
+ *      internal type.
+ * @static
+ */
+SpRestApi.replaceSharepointSpecialChars = function (inputString) {
+    return inputString
+        .replace(/_/g, '_x005f_')
+        .replace(/ /g, '_x0020_')
+        .replace(/&/g, '_x0026_');
+}
+
+/**
  * A generic function to call any URL of the SharePoint REST API. Usually
  * there is no need to call this method directly.
  * @param {string} url - The URL of the SharePoint REST API to be queried. Will
