@@ -302,7 +302,7 @@ SpRestApi.prototype.updateItem = function (listItemId, item) {
 
 /**
  * Deletes a single item from a SharePoint list.
- * @type {number} itemId - The SharePoint list item ID of the item to be
+ * @param {number} itemId - The SharePoint list item ID of the item to be
  *      deleted.
  */
 SpRestApi.prototype.deleteItem = function (itemId) {
