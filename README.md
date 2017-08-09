@@ -111,6 +111,11 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 - `updateItem()` - updates a single list item.
 - `deleteItem()` - deletes a single list item.
 
+#### Users
+
+- `getUserById()` - fetch information about a SharePoint user by their ID.
+- `getCurrentUser()` - same as `getUserById()`, called with the ID of the current user.
+
 #### Utilities
 
 - `refreshDigest()` - gets a new the SharePoint security validation / token, and stores it in the `options`.
