@@ -197,7 +197,10 @@ SpRestApi.prototype.getItem = function (itemId) {
  * @param {Function} error - Callback for failed REST API call.
  */
 SpRestApi.prototype.loadUrl = function (url, method, success, error) {
-    $.ajax({
+    // Preserve `this` containing the current instance of SpRestApi.
+    var $ajax = $.proxy($.ajax, this);
+
+    $ajax({
         url: url,
         type: method,
         cache: false,
