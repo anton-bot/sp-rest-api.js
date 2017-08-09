@@ -2,9 +2,17 @@
 
 ## A lightweight JS library to work with SharePoint lists using the SharePoint REST API.
 
-The purpose of `sp-rest-api.js` is to make it easier to query SharePoint REST API by providing a few shortcuts and convenient defaults for common CRUD operations, such as reading, updating and deleting list items. 
+The purpose of `sp-rest-api.js` is to make it easier to query SharePoint REST API by providing a few shortcuts and convenient defaults for common CRUD operations, such as reading, updating and deleting list items.
+
+There's no need to learn - begin right away with examples below.
 
 ### Examples
+
+All you need to set up is:
+
+```
+     <script src="sp-rest-api.js"></script>
+```
 
 #### Get all items from a list
 
