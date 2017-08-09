@@ -72,6 +72,7 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 
 #### SharePoint Lists
 - `getAllItems()` - fetch all items from a list
+- `getAllItemsFromListSubfolder()` - fetch all items from a subfolder in a list
 - `getItem()` - fetch a single item from the list
 
 #### Utilities
@@ -80,8 +81,9 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 
 #### Other/internal methods
 
-- `addMaxItems` - adds `$top` parameter to URL.
+- `addMaxItems()` - adds `$top` parameter to URL.
 - `loadUrl()` - fetches the specified URL.
+- `generateGetAllListItemsUrl()` - generates the API URL to fetch all items from a list
 
 ### License
 
