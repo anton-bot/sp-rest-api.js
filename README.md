@@ -28,7 +28,7 @@ api.lists('Projects').getAllItems();
 ```
 // Read a single SharePoint list item, and run a callback
 // after success or error.
-var options = {
+var api = new SpRestApi({
     listTitle: 'Projects',
     onsuccess: function(data) {
         alert('Success!');
@@ -36,8 +36,7 @@ var options = {
     onerror: function(data) {
         alert('Error!');
     },
-};
-var api = new SpRestApi(options);
+});
 api.getItem(123);
 ```
 
@@ -98,6 +97,8 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 - `generateGetAllListItemsUrl()` - generates the API URL to fetch all items from a list
 - `continueRecursiveFetch()` - continues fetching all list items if `options.recursiveFetch` is on.
 
-### License
+### License and contributing
 
 Public domain. Do whatever you want.
+
+Pull requests, bug reports and feature requests are welcome.
