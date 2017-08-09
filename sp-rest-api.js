@@ -178,7 +178,7 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
 SpRestApi.prototype.generateSingleListItemUrl = function (itemId) {
     return this.options.siteUrl +
         this.options.urls.item.format(this.options.listTitle, itemId);
-}
+};
 
 /**
  * Returns all list items from a subfolder of a SharePoint list. Uses a hacky
@@ -302,7 +302,7 @@ SpRestApi.prototype.deleteItem = function (itemId) {
 SpRestApi.getListItemType = function (listTitle) {
     var type = "SP.Data." + listTitle.capitalize() + "ListItem";
     return SpRestApi.replaceSharepointSpecialChars(type);
-}
+};
 
 /**
  * Replaces special characters (like underscores and spaces) that
@@ -319,7 +319,7 @@ SpRestApi.replaceSharepointSpecialChars = function (inputString) {
         .replace(/_/g, '_x005f_')
         .replace(/ /g, '_x0020_')
         .replace(/&/g, '_x0026_');
-}
+};
 
 /**
  * A generic function to call any URL of the SharePoint REST API. Usually
@@ -448,5 +448,5 @@ if (!String.prototype.capitalize) {
         return this.replace(/\b[a-z]/g, function (letter) {
             return letter.toUpperCase();
         });
-    }
+    };
 }
