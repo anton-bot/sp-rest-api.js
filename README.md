@@ -8,10 +8,10 @@ There's no need to learn - begin right away with examples below.
 
 ### Examples
 
-All you need to set up is:
+All you need to get started is:
 
 ```
-     <script src="sp-rest-api.js"></script>
+<script src="sp-rest-api.js"></script>
 ```
 
 #### Get all items from a list
