@@ -248,7 +248,7 @@ SpRestApi.prototype.continueRecursiveFetch = function (data) {
             };
         }
 
-        this.options.success(entireData);
+        this.options.onsuccess(entireData);
     }
 };
 
