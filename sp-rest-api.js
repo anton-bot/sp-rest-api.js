@@ -104,7 +104,7 @@ SpRestApi.prototype.cachedListItems = [];
 /**
  * Sets the list title (list display name) of this SpRestApi instance.
  * The .lists() must be called before any call to other list-related
- * methods.
+ * methods. Equivalent to .config({listTitle: 'List Name'}).
  * @param {string} listTitle - The display name of the SharePoint list.
  * @returns {SpRestApi} Returns the instance of this SpRestApi object.
  */
@@ -316,6 +316,8 @@ SpRestApi.prototype.deleteItem = function (itemId) {
  * are replaced with sequences like _x0020_.
  * @param {string} listTitle - The display name of the list where we are
  *      creating the new list item.
+ * @returns {string} A SharePoint list item type which looks like
+ *      "SP.Data.ProjectsListItem".
  * @static
  */
 SpRestApi.getListItemType = function (listTitle) {
