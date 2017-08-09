@@ -353,6 +353,7 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error, data) {
         url: url,
         type: method,
         cache: false,
+        data: data,
         contentType: this.options.verbosity,
         headers: headers,
         success: function (response) {
