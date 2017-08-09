@@ -23,7 +23,7 @@ var api = new SpRestApi();
 api.lists('Projects').getAllItems();
 ```
 
-#### Get a single item from a list, run a callback
+#### Get an item from a list, run a callback
 
 ```js
 // Read a single SharePoint list item, and run a callback
@@ -40,6 +40,16 @@ var api = new SpRestApi({
 api.getItem(123);
 ```
 
+#### Delete a list item
+
+```js
+// Deletes a single SharePoint list item, runs callback
+var api = new SpRestApi({
+    listTitle: 'Projects',
+    onsuccess: function() { alert('Done!'); }
+});
+api.deleteItem(491);
+```
 
 ### Requirements
 
@@ -91,10 +101,11 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 
 - `refreshDigest()` - gets a new the SharePoint security validation / token, and stores it in the `options`.
 
-#### Other/internal methods
+#### Internal methods
 
 - `addMaxItems()` - adds `$top` parameter to URL.
 - `loadUrl()` - fetches the specified URL.
+- `generateSingleListItemUrl()` - generates the API URL to fetch/delete a single list item
 - `generateGetAllListItemsUrl()` - generates the API URL to fetch all items from a list
 - `continueRecursiveFetch()` - continues fetching all list items if `options.recursiveFetch` is on.
 
