@@ -88,4 +88,4 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 
 ### License
 
-MIT. Do whatever you want.
+Public domain. Do whatever you want.
