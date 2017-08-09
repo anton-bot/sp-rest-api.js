@@ -46,7 +46,9 @@ api.getItem(123);
 - jQuery 1+
 - SharePoint 2013, 2016 or online
 
-If using this library in a non-SharePoint page (e.g. a normal HTML file), you need to specify the `siteUrl` option when initializing the `SpRestApi`, and then run `refreshDigest()` to get the authorization token. Until `refreshDigest()` completes successfully, all SharePoint API calls will fail.
+#### Outside SharePoint pages
+
+If using this library in a non-SharePoint page (e.g. in a normal HTML file), you need to specify the `siteUrl` option when initializing the `SpRestApi`, and then run `refreshDigest()` to get the authorization token. Until `refreshDigest()` completes successfully, all SharePoint API calls will fail.
 
 ```js
 var api = new SpRestApi({
