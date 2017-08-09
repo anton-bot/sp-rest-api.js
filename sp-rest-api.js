@@ -160,7 +160,7 @@ SpRestApi.prototype.getAllItems = function () {
 
 /**
  * Generates the URL for fetching all items from a list. Uses in getAllItems()
- * and in getAllItemsFromSubfolder().
+ * and in getAllItemsFromSubfolder(), as well as to create/POST a new item.
  * @returns {string} The SP API URL for fetching all items from a list.
  */
 SpRestApi.prototype.generateGetAllListItemsUrl = function () {
@@ -266,6 +266,22 @@ SpRestApi.prototype.getItem = function (itemId) {
 };
 
 /**
+ * Creates a new item in a SharePoint list. 
+ * @param {Object} item - The new SharePoint list item to be created. No need
+ *      to add the __metadata attribute.
+ */
+SpRestApi.prototype.createItem = function (item) {
+    item.__metadata = {
+        "type": SpRestApi.getListItemType(this.options.listTitle)
+    };
+
+    var url = this.generateGetAllListItemsUrl();
+
+    this.loadUrl(url, 'POST',
+        this.options.onsuccess, this.options.onerror, item);
+}
+
+/**
  * Deletes a single item from a SharePoint list.
  * @type {number} itemId - The SharePoint list item ID of the item to be
  *      deleted.
@@ -289,7 +305,7 @@ SpRestApi.getListItemType = function (listTitle) {
 }
 
 /**
- * Replaces Replaces special characters (like underscores and spaces) that
+ * Replaces special characters (like underscores and spaces) that
  * cannot be used in SharePoint list names because SharePoint changes them to 
  * escape sequences, as seen in the function.
  * @param {string} inputString - A string that may contain an underscore or a
