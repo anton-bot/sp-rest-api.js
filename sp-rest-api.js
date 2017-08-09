@@ -60,6 +60,8 @@ SpRestApi.Verbosity = {
 /**
  * @typedef {Object} SpRestApiOptions - The options passed to methods
  *      inside the SpRestApi class.
+ * @property {Array.<SpRestApiFilterCriterion>} filters - The filters to be
+ *      used in filtering the list items using the $filter parameter.
  * @property {string} [token] - The SharePoint's request digest, a token that
  *      it is required for every API call. Required only if using outside a
  *      SharePoint page, otherwise it is obtained automatically from DOM.
@@ -135,9 +137,39 @@ SpRestApi.prototype.addMaxItems = function (url) {
  * or the limit specified in the options.
  */
 SpRestApi.prototype.getAllItems = function () {
+    var url = generateGetAllListItemsUrl();
+    this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
+};
+
+/**
+ * Generates the URL for fetching all items from a list. Uses in getAllItems()
+ * and in getAllItemsFromSubfolder().
+ * @returns {string} The SP API URL for fetching all items from a list.
+ */
+SpRestApi.prototype.generateGetAllListItemsUrl = function () {
     var url = this.options.siteUrl +
         this.options.urls.list.format(this.options.listTitle);
     url = this.addMaxItems(url);
+    return url;
+};
+
+/**
+ * Returns all list items from a subfolder of a SharePoint list. Uses a hacky
+ * way - by matching a substring of the FileRef, to avoid relying on CAML.
+ * @param {string} subfolderName - The display name of the subfolder in a list.
+ *      Must not include any slashes.
+ */
+SpRestApi.prototype.getAllItemsFromListSubfolder = function (subfolderName) {
+    // The idea here is that if the FileRef property of a list item is
+    // like this - /sites/mysite/Lists/My List/My Subfolder/123_.000 - 
+    // then we can filter the list by FileRef containing the 
+    // string 'Lists/My List/My Subfolder'.
+    var fileref = 'Lists/' +
+        this.options.listTitle + '/' + subfolderName + '/';
+
+    var url = this.generateGetAllListItemsUrl();
+    url += '&$filter=substringof(\'' + fileref + '\', FileRef)';
+
     this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
 };
 
