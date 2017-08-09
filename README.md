@@ -96,6 +96,7 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 
 ##### Writing
 - `createItem()` - creates a single list item.
+- `updateItem()` - updates a single list item.
 - `deleteItem()` - deletes a single list item.
 
 #### Utilities
