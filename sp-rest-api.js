@@ -79,7 +79,7 @@ SpRestApi.Verbosity = {
  *      repeatedly making server requests until all list items are fetched.
  *      This is to overcome SharePoint's limitation of maximum 5000 items
  *      per call.
- * @property {string} [verbosity] - The amount of metadata to be returned
+ * @property {Verbosity} [verbosity] - The amount of metadata to be returned
  *      in the JSON response from server. Use the SpRestApi.Verbosity enum.
  * @property {string} [siteUrl] - The SharePoint site URL which is usually
  *      obtained from the _spPageContextInfo.webAbsoluteUrl. Required if using
@@ -92,6 +92,14 @@ SpRestApi.Verbosity = {
  * @type {SpRestApiOptions}
  */
 SpRestApi.prototype.options = {};
+
+/**
+ * Array of cached SharePoint list items. Stores the data during the recursive
+ * fetch (options.recursiveFetch = true), and is cleared immediately when the
+ * recursive fetch completes.
+ * @type {Array.<Object>}
+ */
+SpRestApi.prototype.cachedListItems = [];
 
 /**
  * Sets the list title (list display name) of this SpRestApi instance.
@@ -137,8 +145,17 @@ SpRestApi.prototype.addMaxItems = function (url) {
  * or the limit specified in the options.
  */
 SpRestApi.prototype.getAllItems = function () {
-    var url = generateGetAllListItemsUrl();
-    this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
+    var url = this.generateGetAllListItemsUrl();
+
+    var onsuccess;
+    if (this.options.recursiveFetch) {
+        // Continue fetching items recursively until we load the entire list:
+        onsuccess = this.continueRecursiveFetch;
+    } else {
+        onsuccess = this.options.onsuccess;        
+    }
+
+    this.loadUrl(url, 'GET', onsuccess, this.options.onerror);
 };
 
 /**
@@ -170,7 +187,59 @@ SpRestApi.prototype.getAllItemsFromListSubfolder = function (subfolderName) {
     var url = this.generateGetAllListItemsUrl();
     url += '&$filter=substringof(\'' + fileref + '\', FileRef)';
 
-    this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
+    var onsuccess;
+    if (this.options.recursiveFetch) {
+        // Continue fetching items recursively until we load the entire list:
+        onsuccess = this.continueRecursiveFetch;
+    } else {
+        onsuccess = this.options.onsuccess;
+    }
+
+    this.loadUrl(url, 'GET', onsuccess, this.options.onerror);
+};
+
+/**
+ * Keeps loading data recursively until all list items are obtained. This is
+ * to overcome SharePoint's limitation on the number of list items per query.
+ */
+SpRestApi.prototype.continueRecursiveFetch = function (data) {
+    var newData;
+    var nextUrl;
+
+    // Depending on the Verbosity setting, the data will be returned in
+    // significantly different formats (inside data.d.results or data.value).
+    if (this.options.verbosity === SpRestApi.Verbosity.VERBOSE) {
+        newData = data.d.results;
+        nextUrl = data.d.__next;
+    } else {
+        newData = data.value;
+        nextUrl = data['odata.nextLink']; // dot in property name
+    }
+
+    this.cachedListItems = this.cachedListItems.concat(newData);
+
+    if (nextUrl) {
+        // While next URL is not empty, keep loading recursively:
+        this.loadUrl(nextUrl, 'GET',
+            this.continueRecursiveFetch, this.options.onerror);
+    } else {
+        // Load complete - generate a structure similar to server response, 
+        // and call the callback.
+        var entireData;
+        if (this.options.verbosity === SpRestApi.Verbosity.VERBOSE) {
+            entireData = {
+                d: {
+                    results: this.cachedListItems
+                }
+            };
+        } else {
+            entireData = {
+                value: this.cachedListItems
+            };
+        }
+
+        this.options.success(entireData);
+    }
 };
 
 /**
