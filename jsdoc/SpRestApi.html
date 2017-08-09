@@ -200,6 +200,78 @@
 
         
             
+<h4 class="name" id="cachedListItems"><span class="type-signature"></span>cachedListItems<span class="type-signature"> :Array.&lt;Object></span></h4>
+
+
+
+
+<div class="description">
+    Array of cached SharePoint list items. Stores the data during the recursivefetch (options.recursiveFetch = true), and is cleared immediately when therecursive fetch completes.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;Object></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line102">line 102</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
 <h4 class="name" id="options"><span class="type-signature"></span>options<span class="type-signature"> :<a href="global.html#SpRestApiOptions">SpRestApiOptions</a></span></h4>
 
 
@@ -275,6 +347,290 @@
 
     
         <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getListItemType"><span class="type-signature">(static) </span>getListItemType<span class="signature">(listTitle)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Generates the ListItemType which is required by SharePoint when creating anew list item. It is based on the list name where characters such as spacesare replaced with sequences like _x0020_.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>listTitle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The display name of the list where we are     creating the new list item.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line321">line 321</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".replaceSharepointSpecialChars"><span class="type-signature">(static) </span>replaceSharepointSpecialChars<span class="signature">(inputString)</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Replaces special characters (like underscores and spaces) thatcannot be used in SharePoint list names because SharePoint changes them to escape sequences, as seen in the function.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>inputString</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A string that may contain an underscore or a     space, which will be replaced.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line336">line 336</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The string that is safe to use in SharePoint list item     internal type.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
         
             
@@ -381,7 +737,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line128">line 128</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line136">line 136</a>
     </li></ul></dd>
     
 
@@ -534,7 +890,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line115">line 115</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line123">line 123</a>
     </li></ul></dd>
     
 
@@ -587,14 +943,14 @@
 
     
 
-    <h4 class="name" id="generateGetAllListItemsUrl"><span class="type-signature"></span>generateGetAllListItemsUrl<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id="continueRecursiveFetch"><span class="type-signature"></span>continueRecursiveFetch<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Generates the URL for fetching all items from a list. Uses in getAllItems()and in getAllItemsFromSubfolder().
+    Keeps loading data recursively until all list items are obtained. This isto overcome SharePoint's limitation on the number of list items per query.
 </div>
 
 
@@ -638,7 +994,302 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line149">line 149</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line215">line 215</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="createItem"><span class="type-signature"></span>createItem<span class="signature">(item)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Creates a new item in a SharePoint list.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>item</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new SharePoint list item to be created. No need     to add the __metadata attribute.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line273">line 273</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="deleteItem"><span class="type-signature"></span>deleteItem<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Deletes a single item from a SharePoint list.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line308">line 308</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="generateGetAllListItemsUrl"><span class="type-signature"></span>generateGetAllListItemsUrl<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Generates the URL for fetching all items from a list. Uses in getAllItems()and in getAllItemsFromSubfolder(), as well as to create/POST a new item.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line166">line 166</a>
     </li></ul></dd>
     
 
@@ -666,6 +1317,159 @@
         
 <div class="param-desc">
     The SP API URL for fetching all items from a list.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="generateSingleListItemUrl"><span class="type-signature"></span>generateSingleListItemUrl<span class="signature">(itemId)</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Generates the URL for getting, updating or deleting a single list item.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>itemId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The list item ID of the item to be deleted.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line178">line 178</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An URL ending with e.g. /Lists('MyList')/Items(761)
 </div>
 
 
@@ -742,7 +1546,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line139">line 139</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line147">line 147</a>
     </li></ul></dd>
     
 
@@ -873,7 +1677,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line162">line 162</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line189">line 189</a>
     </li></ul></dd>
     
 
@@ -1004,7 +1808,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line181">line 181</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line260">line 260</a>
     </li></ul></dd>
     
 
@@ -1135,7 +1939,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line103">line 103</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line111">line 111</a>
     </li></ul></dd>
     
 
@@ -1188,7 +1992,7 @@
 
     
 
-    <h4 class="name" id="loadUrl"><span class="type-signature"></span>loadUrl<span class="signature">(url, method, success, error)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="loadUrl"><span class="type-signature"></span>loadUrl<span class="signature">(url, method, success, error, data<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -1219,6 +2023,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1244,6 +2050,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -1266,6 +2080,14 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1290,6 +2112,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -1313,10 +2143,51 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last">Callback for failed REST API call.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The data to be POSTed/PUT to the server.</td>
         </tr>
 
     
@@ -1357,7 +2228,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line199">line 199</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line354">line 354</a>
     </li></ul></dd>
     
 
@@ -1488,7 +2359,161 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line226">line 226</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line395">line 395</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="updateItem"><span class="type-signature"></span>updateItem<span class="signature">(listItemId, item)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Updates a single item in the SharePoint list. Only the values in columnsspecified in `data` will be overwritten.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>listItemId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The SharePoint list item ID of the item to be     updated.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>item</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The partial or full SharePoint list item containing     only the columns that need to be replaced.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line292">line 292</a>
     </li></ul></dd>
     
 
@@ -1536,7 +2561,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Aug 09 2017 10:22:29 GMT+0800 (China Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Aug 09 2017 22:12:09 GMT+0800 (China Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

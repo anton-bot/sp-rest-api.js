@@ -107,7 +107,7 @@ SpRestApi.Verbosity = {
  *      repeatedly making server requests until all list items are fetched.
  *      This is to overcome SharePoint's limitation of maximum 5000 items
  *      per call.
- * @property {string} [verbosity] - The amount of metadata to be returned
+ * @property {Verbosity} [verbosity] - The amount of metadata to be returned
  *      in the JSON response from server. Use the SpRestApi.Verbosity enum.
  * @property {string} [siteUrl] - The SharePoint site URL which is usually
  *      obtained from the _spPageContextInfo.webAbsoluteUrl. Required if using
@@ -120,6 +120,14 @@ SpRestApi.Verbosity = {
  * @type {SpRestApiOptions}
  */
 SpRestApi.prototype.options = {};
+
+/**
+ * Array of cached SharePoint list items. Stores the data during the recursive
+ * fetch (options.recursiveFetch = true), and is cleared immediately when the
+ * recursive fetch completes.
+ * @type {Array.&lt;Object>}
+ */
+SpRestApi.prototype.cachedListItems = [];
 
 /**
  * Sets the list title (list display name) of this SpRestApi instance.
@@ -165,13 +173,22 @@ SpRestApi.prototype.addMaxItems = function (url) {
  * or the limit specified in the options.
  */
 SpRestApi.prototype.getAllItems = function () {
-    var url = generateGetAllListItemsUrl();
-    this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
+    var url = this.generateGetAllListItemsUrl();
+
+    var onsuccess;
+    if (this.options.recursiveFetch) {
+        // Continue fetching items recursively until we load the entire list:
+        onsuccess = this.continueRecursiveFetch;
+    } else {
+        onsuccess = this.options.onsuccess;        
+    }
+
+    this.loadUrl(url, 'GET', onsuccess, this.options.onerror);
 };
 
 /**
  * Generates the URL for fetching all items from a list. Uses in getAllItems()
- * and in getAllItemsFromSubfolder().
+ * and in getAllItemsFromSubfolder(), as well as to create/POST a new item.
  * @returns {string} The SP API URL for fetching all items from a list.
  */
 SpRestApi.prototype.generateGetAllListItemsUrl = function () {
@@ -179,6 +196,16 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
         this.options.urls.list.format(this.options.listTitle);
     url = this.addMaxItems(url);
     return url;
+};
+
+/**
+ * Generates the URL for getting, updating or deleting a single list item.
+ * @param {number} itemId - The list item ID of the item to be deleted.
+ * @returns {string} An URL ending with e.g. /Lists('MyList')/Items(761)
+ */
+SpRestApi.prototype.generateSingleListItemUrl = function (itemId) {
+    return this.options.siteUrl +
+        this.options.urls.item.format(this.options.listTitle, itemId);
 };
 
 /**
@@ -198,7 +225,59 @@ SpRestApi.prototype.getAllItemsFromListSubfolder = function (subfolderName) {
     var url = this.generateGetAllListItemsUrl();
     url += '&amp;$filter=substringof(\'' + fileref + '\', FileRef)';
 
-    this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
+    var onsuccess;
+    if (this.options.recursiveFetch) {
+        // Continue fetching items recursively until we load the entire list:
+        onsuccess = this.continueRecursiveFetch;
+    } else {
+        onsuccess = this.options.onsuccess;
+    }
+
+    this.loadUrl(url, 'GET', onsuccess, this.options.onerror);
+};
+
+/**
+ * Keeps loading data recursively until all list items are obtained. This is
+ * to overcome SharePoint's limitation on the number of list items per query.
+ */
+SpRestApi.prototype.continueRecursiveFetch = function (data) {
+    var newData;
+    var nextUrl;
+
+    // Depending on the Verbosity setting, the data will be returned in
+    // significantly different formats (inside data.d.results or data.value).
+    if (this.options.verbosity === SpRestApi.Verbosity.VERBOSE) {
+        newData = data.d.results;
+        nextUrl = data.d.__next;
+    } else {
+        newData = data.value;
+        nextUrl = data['odata.nextLink']; // dot in property name
+    }
+
+    this.cachedListItems = this.cachedListItems.concat(newData);
+
+    if (nextUrl) {
+        // While next URL is not empty, keep loading recursively:
+        this.loadUrl(nextUrl, 'GET',
+            this.continueRecursiveFetch, this.options.onerror);
+    } else {
+        // Load complete - generate a structure similar to server response, 
+        // and call the callback.
+        var entireData;
+        if (this.options.verbosity === SpRestApi.Verbosity.VERBOSE) {
+            entireData = {
+                d: {
+                    results: this.cachedListItems
+                }
+            };
+        } else {
+            entireData = {
+                value: this.cachedListItems
+            };
+        }
+
+        this.options.success(entireData);
+    }
 };
 
 /**
@@ -215,6 +294,81 @@ SpRestApi.prototype.getItem = function (itemId) {
 };
 
 /**
+ * Creates a new item in a SharePoint list. 
+ * @param {Object} item - The new SharePoint list item to be created. No need
+ *      to add the __metadata attribute.
+ */
+SpRestApi.prototype.createItem = function (item) {
+    item.__metadata = {
+        "type": SpRestApi.getListItemType(this.options.listTitle)
+    };
+
+    var url = this.generateGetAllListItemsUrl();
+
+    this.loadUrl(url, 'POST',
+        this.options.onsuccess, this.options.onerror, item);
+};
+
+/**
+ * Updates a single item in the SharePoint list. Only the values in columns
+ * specified in `data` will be overwritten.
+ * @param {number} listItemId - The SharePoint list item ID of the item to be
+ *      updated.
+ * @param {Object} item - The partial or full SharePoint list item containing
+ *      only the columns that need to be replaced.
+ */
+SpRestApi.prototype.updateItem = function (listItemId, item) {
+    item.__metadata = {
+        "type": SpRestApi.getListItemType(this.options.listTitle)
+    };
+
+    var url = this.generateSingleListItemUrl(listItemId);
+
+    this.loadUrl(url, 'MERGE',
+        this.options.onsuccess, this.options.onerror, item);
+};
+
+/**
+ * Deletes a single item from a SharePoint list.
+ * @type {number} itemId - The SharePoint list item ID of the item to be
+ *      deleted.
+ */
+SpRestApi.prototype.deleteItem = function (itemId) {
+    var url = this.generateSingleListItemUrl(itemId);
+    this.loadUrl(url, 'DELETE', this.options.onsuccess, this.options.onerror);
+};
+
+/**
+ * Generates the ListItemType which is required by SharePoint when creating a
+ * new list item. It is based on the list name where characters such as spaces
+ * are replaced with sequences like _x0020_.
+ * @param {string} listTitle - The display name of the list where we are
+ *      creating the new list item.
+ * @static
+ */
+SpRestApi.getListItemType = function (listTitle) {
+    var type = "SP.Data." + listTitle.capitalize() + "ListItem";
+    return SpRestApi.replaceSharepointSpecialChars(type);
+};
+
+/**
+ * Replaces special characters (like underscores and spaces) that
+ * cannot be used in SharePoint list names because SharePoint changes them to 
+ * escape sequences, as seen in the function.
+ * @param {string} inputString - A string that may contain an underscore or a
+ *      space, which will be replaced.
+ * @returns {string} The string that is safe to use in SharePoint list item
+ *      internal type.
+ * @static
+ */
+SpRestApi.replaceSharepointSpecialChars = function (inputString) {
+    return inputString
+        .replace(/_/g, '_x005f_')
+        .replace(/ /g, '_x0020_')
+        .replace(/&amp;/g, '_x0026_');
+};
+
+/**
  * A generic function to call any URL of the SharePoint REST API. Usually
  * there is no need to call this method directly.
  * @param {string} url - The URL of the SharePoint REST API to be queried. Will
@@ -223,22 +377,37 @@ SpRestApi.prototype.getItem = function (itemId) {
  *      'DELETE'.
  * @param {Function} success - Callback for successfull REST API call.
  * @param {Function} error - Callback for failed REST API call.
+ * @param {Object} [data] - The data to be POSTed/PUT to the server.
  */
-SpRestApi.prototype.loadUrl = function (url, method, success, error) {
-    $.ajax({
+SpRestApi.prototype.loadUrl = function (url, method, success, error, data) {
+    // Preserve `this` containing the current instance of SpRestApi.
+    var $ajax = $.proxy($.ajax, this);
+
+    // These headers are common for all requests
+    var headers = {
+        "Accept": this.options.verbosity,
+        "X-RequestDigest": this.options.token,
+    };
+
+    // For the DELETE/MERGE methods, we actually send the request as POST
+    if (method === 'DELETE' || method === 'MERGE') {
+        headers['IF-MATCH'] = '*';
+        headers['X-HTTP-METHOD'] = method;
+        method = 'POST';
+    }
+
+    $ajax({
         url: url,
         type: method,
         cache: false,
+        data: data,
         contentType: this.options.verbosity,
-        headers: {
-            "Accept": this.options.verbosity,
-            "X-RequestDigest": this.options.token,
+        headers: headers,
+        success: function (response) {
+            success(response);
         },
-        success: function (data) {
-            success(data);
-        },
-        error: function (data) {
-            error(data);
+        error: function (response) {
+            error(response);
         },
     });
 };
@@ -316,6 +485,17 @@ if (!String.prototype.includes) {
             return this.indexOf(search, start) !== -1;
         }
     };
+}
+
+if (!String.prototype.capitalize) {
+    /**
+     * Capitalizes the first letter of each word in the string.
+     */
+    String.prototype.capitalize = function () {
+        return this.replace(/\b[a-z]/g, function (letter) {
+            return letter.toUpperCase();
+        });
+    };
 }</code></pre>
         </article>
     </section>
@@ -332,7 +512,7 @@ if (!String.prototype.includes) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Aug 09 2017 10:22:29 GMT+0800 (China Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Aug 09 2017 22:12:09 GMT+0800 (China Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
