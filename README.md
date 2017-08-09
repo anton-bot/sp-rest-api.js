@@ -84,6 +84,7 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 - `addMaxItems()` - adds `$top` parameter to URL.
 - `loadUrl()` - fetches the specified URL.
 - `generateGetAllListItemsUrl()` - generates the API URL to fetch all items from a list
+- `continueRecursiveFetch()` - continues fetching all list items if `options.recursiveFetch` is on.
 
 ### License
 
