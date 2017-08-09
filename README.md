@@ -40,13 +40,25 @@ var api = new SpRestApi({
 api.getItem(123);
 ```
 
+#### Update a list item
+
+```js
+// Updates a single SharePoint list item, setting
+// the value in the 'Status' column to 'Completed'.
+var api = new SpRestApi({
+    listTitle: 'Projects',
+    onsuccess: function() { alert('Done!'); }, 
+});
+api.updateItem(81, { Status: 'Completed' });
+```
+
 #### Delete a list item
 
 ```js
 // Deletes a single SharePoint list item, runs callback
 var api = new SpRestApi({
     listTitle: 'Projects',
-    onsuccess: function() { alert('Done!'); }
+    onsuccess: function() { alert('Done!'); },
 });
 api.deleteItem(491);
 ```
