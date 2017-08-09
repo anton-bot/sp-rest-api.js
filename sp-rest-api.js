@@ -31,6 +31,7 @@ var SpRestApi = function (options) {
         urls: {
             list: '/_api/web/lists/getbytitle(\'{0}\')/items',
             item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
+            user: '/_api/Web/GetUserById({0})?$expand=Groups',
         },
     };
 
@@ -308,6 +309,32 @@ SpRestApi.prototype.updateItem = function (listItemId, item) {
 SpRestApi.prototype.deleteItem = function (itemId) {
     var url = this.generateSingleListItemUrl(itemId);
     this.loadUrl(url, 'DELETE', this.options.onsuccess, this.options.onerror);
+};
+
+/**
+ * Fetches the SharePoint user information, including the Groups that he is a
+ * member of.
+ * @param {number} userId - The SharePoint user ID of the user whose information
+ *      we are requesting.
+ */
+SpRestApi.prototype.getUserById = function (userId) {
+    if (!userId) {
+        throw "Tried to get user information using an empty user ID.";
+    }
+
+    var url = this.options.urls.user.format(userId);
+
+    this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
+};
+
+/**
+ * Fetches the information about the current user, such as email, groups etc.
+ * Wrapper for getUserById(), gets the current user ID automatically.
+ */
+SpRestApi.prototype.getCurrentUser = function () {
+    if (!_spPageContextInfo) { throw 'Missing _spPageContextInfo.'; }
+
+    this.getUserById(_spPageContextInfo.userId);
 };
 
 /**
