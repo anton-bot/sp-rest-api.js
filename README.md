@@ -10,13 +10,13 @@ There's no need to learn - begin right away with examples below.
 
 All you need to get started is:
 
-```
+```html
 <script src="sp-rest-api.js"></script>
 ```
 
 #### Get all items from a list
 
-```
+```js
 // Read all items from the Projects list in SharePoint,
 // and print them using console.log(), the default callback.
 var api = new SpRestApi();
@@ -25,7 +25,7 @@ api.lists('Projects').getAllItems();
 
 #### Get a single item from a list, run a callback
 
-```
+```js
 // Read a single SharePoint list item, and run a callback
 // after success or error.
 var api = new SpRestApi({
@@ -48,11 +48,10 @@ api.getItem(123);
 
 If using this library in a non-SharePoint page (e.g. a normal HTML file), you need to specify the `siteUrl` option when initializing the `SpRestApi`, and then run `refreshDigest()` to get the authorization token. Until `refreshDigest()` completes successfully, all SharePoint API calls will fail.
 
-```
-var options = {
+```js
+var api = new SpRestApi({
     siteUrl: 'http://sharepoint.example.com/sites/mysite',
-};
-var api = new SpRestApi(options);
+});
 api.refreshDigest(initializePage); // Insert your callback function here
 ```
 
@@ -60,7 +59,7 @@ api.refreshDigest(initializePage); // Insert your callback function here
 
 Just place `sp-rest-api.js` into any folder on the site, e.g. into `/SiteAssets`, and include it after the jQuery and SP JavaScript files:
 
-```
+```html
 <script src='../SiteAssets/sp-rest-api.js'></script>
 ```
 
