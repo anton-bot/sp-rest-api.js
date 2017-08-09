@@ -271,7 +271,8 @@ SpRestApi.prototype.getItem = function (itemId) {
  *      deleted.
  */
 SpRestApi.prototype.deleteItem = function (itemId) {
-    var url = 
+    var url = this.generateSingleListItemUrl(itemId);
+    this.loadUrl(url, 'DELETE', this.options.onsuccess, this.options.onerror);
 };
 
 /**
