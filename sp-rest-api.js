@@ -391,3 +391,14 @@ if (!String.prototype.includes) {
         }
     };
 }
+
+if (!String.prototype.capitalize) {
+    /**
+     * Capitalizes the first letter of each word in the string.
+     */
+    String.prototype.capitalize = function () {
+        return this.replace(/\b[a-z]/g, function (letter) {
+            return letter.toUpperCase();
+        });
+    }
+}
