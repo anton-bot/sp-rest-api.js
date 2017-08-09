@@ -171,7 +171,7 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
 };
 
 /**
- * Generates the URL for getting or deleting a single list item.
+ * Generates the URL for getting, updating or deleting a single list item.
  * @param {number} itemId - The list item ID of the item to be deleted.
  * @returns {string} An URL ending with e.g. /Lists('MyList')/Items(761)
  */
@@ -279,7 +279,26 @@ SpRestApi.prototype.createItem = function (item) {
 
     this.loadUrl(url, 'POST',
         this.options.onsuccess, this.options.onerror, item);
-}
+};
+
+/**
+ * Updates a single item in the SharePoint list. Only the values in columns
+ * specified in `data` will be overwritten.
+ * @param {number} listItemId - The SharePoint list item ID of the item to be
+ *      updated.
+ * @param {Object} item - The partial or full SharePoint list item containing
+ *      only the columns that need to be replaced.
+ */
+SpRestApi.prototype.updateItem = function (listItemId, item) {
+    item.__metadata = {
+        "type": SpRestApi.getListItemType(this.options.listTitle)
+    };
+
+    var url = this.generateSingleListItemUrl(listItemId);
+
+    this.loadUrl(url, 'MERGE',
+        this.options.onsuccess, this.options.onerror, item);
+};
 
 /**
  * Deletes a single item from a SharePoint list.
@@ -342,10 +361,10 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error, data) {
         "X-RequestDigest": this.options.token,
     };
 
-    // For the DELETE method, we actually send the request as POST
-    if (method === 'DELETE') {
+    // For the DELETE/MERGE methods, we actually send the request as POST
+    if (method === 'DELETE' || method === 'MERGE') {
         headers['IF-MATCH'] = '*';
-        headers["X-HTTP-METHOD"] = 'DELETE';
+        headers['X-HTTP-METHOD'] = method;
         method = 'POST';
     }
 
