@@ -95,6 +95,7 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 - `getItem()` - fetch a single item from the list
 
 ##### Writing
+- `createItem()` - creates a single list item.
 - `deleteItem()` - deletes a single list item.
 
 #### Utilities
@@ -107,6 +108,8 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 - `loadUrl()` - fetches the specified URL.
 - `generateSingleListItemUrl()` - generates the API URL to fetch/delete a single list item
 - `generateGetAllListItemsUrl()` - generates the API URL to fetch all items from a list
+- `getListItemType()` - generates the ListItemType which is required by SharePoint when creating a new list item
+- `replaceSharepointSpecialChars()` - escapes special characters (like underscores and spaces) like `_x0020_` 
 - `continueRecursiveFetch()` - continues fetching all list items if `options.recursiveFetch` is on.
 
 ### License and contributing
