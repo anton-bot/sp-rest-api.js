@@ -314,8 +314,9 @@ SpRestApi.replaceSharepointSpecialChars = function (inputString) {
  *      'DELETE'.
  * @param {Function} success - Callback for successfull REST API call.
  * @param {Function} error - Callback for failed REST API call.
+ * @param {Object} [data] - The data to be POSTed/PUT to the server.
  */
-SpRestApi.prototype.loadUrl = function (url, method, success, error) {
+SpRestApi.prototype.loadUrl = function (url, method, success, error, data) {
     // Preserve `this` containing the current instance of SpRestApi.
     var $ajax = $.proxy($.ajax, this);
 
@@ -338,11 +339,11 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error) {
         cache: false,
         contentType: this.options.verbosity,
         headers: headers,
-        success: function (data) {
-            success(data);
+        success: function (response) {
+            success(response);
         },
-        error: function (data) {
-            error(data);
+        error: function (response) {
+            error(response);
         },
     });
 };
