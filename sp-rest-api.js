@@ -171,6 +171,16 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
 };
 
 /**
+ * Generates the URL for getting or deleting a single list item.
+ * @param {number} itemId - The list item ID of the item to be deleted.
+ * @returns {string} An URL ending with e.g. /Lists('MyList')/Items(761)
+ */
+SpRestApi.prototype.generateSingleListItemUrl = function (itemId) {
+    return this.options.siteUrl +
+        this.options.urls.item.format(this.options.listTitle, itemId);
+}
+
+/**
  * Returns all list items from a subfolder of a SharePoint list. Uses a hacky
  * way - by matching a substring of the FileRef, to avoid relying on CAML.
  * @param {string} subfolderName - The display name of the subfolder in a list.
@@ -256,6 +266,15 @@ SpRestApi.prototype.getItem = function (itemId) {
 };
 
 /**
+ * Deletes a single item from a SharePoint list.
+ * @type {number} itemId - The SharePoint list item ID of the item to be
+ *      deleted.
+ */
+SpRestApi.prototype.deleteItem = function (itemId) {
+    var url = 
+};
+
+/**
  * A generic function to call any URL of the SharePoint REST API. Usually
  * there is no need to call this method directly.
  * @param {string} url - The URL of the SharePoint REST API to be queried. Will
@@ -269,15 +288,25 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error) {
     // Preserve `this` containing the current instance of SpRestApi.
     var $ajax = $.proxy($.ajax, this);
 
+    // These headers are common for all requests
+    var headers = {
+        "Accept": this.options.verbosity,
+        "X-RequestDigest": this.options.token,
+    };
+
+    // For the DELETE method, we actually send the request as POST
+    if (method === 'DELETE') {
+        headers['IF-MATCH'] = '*';
+        headers["X-HTTP-METHOD"] = 'DELETE';
+        method = 'POST';
+    }
+
     $ajax({
         url: url,
         type: method,
         cache: false,
         contentType: this.options.verbosity,
-        headers: {
-            "Accept": this.options.verbosity,
-            "X-RequestDigest": this.options.token,
-        },
+        headers: headers,
         success: function (data) {
             success(data);
         },
