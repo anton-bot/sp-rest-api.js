@@ -29,6 +29,7 @@ var SpRestApi = function (options) {
         siteUrl: _spPageContextInfo ? _spPageContextInfo.webAbsoluteUrl : '',
         token: digestField ? digestField.value : '',
         urls: {
+            context: '/_api/contextinfo',
             list: '/_api/web/lists/getbytitle(\'{0}\')/items',
             item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
             user: '/_api/Web/GetUserById({0})?$expand=Groups',
@@ -425,10 +426,11 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error, data) {
  * - We are refreshing the token (which expires after 30 minutes).
  * @param {Function} callback - The callback to run after the authorization
  *      token is received successfully.
+ * Do not reuse the SpRestApi object that is used to refreshDigest to fetch
+ * other information, because onsuccess and onerror callbacks will be replaced.
+ * @throws an exception if the token could not be refreshed.
  */
 SpRestApi.prototype.refreshDigest = function (callback) {
-    var url = this.siteUrl + '/_api/contextinfo';
-
     // If request succeeded:
     var success = function (data) {
         // Get token from the appropriate field in the response, and save
@@ -455,12 +457,24 @@ SpRestApi.prototype.refreshDigest = function (callback) {
         }
     };
 
+    // Preserve value of `this` as this SpRestApi instance:
+    this.options.onsuccess = $.proxy(success, this);
+
     // If request failed:
-    var error = function () {
+    this.options.onerror = function () {
         throw 'Unable to obtain SharePoint authorization token';
     };
 
-    this.loadUrl(url, 'POST', $.proxy(success, this), error);
+    this.getContextInfo();
+};
+
+/**
+ * Fetches the context information, most importantly authorization token
+ * and its expiration time.
+ */
+SpRestApi.prototype.getContextInfo = function () {
+    var url = this.siteUrl + this.options.urls.context;
+    this.loadUrl(url, 'POST', this.options.onsuccess, this.options.onerror);
 };
 
 
