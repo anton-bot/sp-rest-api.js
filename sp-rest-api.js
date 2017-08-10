@@ -62,8 +62,15 @@ SpRestApi.Verbosity = {
 /**
  * @typedef {Object} SpRestApiOptions - The options passed to methods
  *      inside the SpRestApi class.
- * @property {Array.<SpRestApiFilterCriterion>} [filters] - The filters to be
- *      used in filtering the list items using the $filter parameter.
+ * @property {string|Array.<string>} [expand] - The columns to be expanded,
+ *      e.g. lookup columns or people/group columns. Use internal column names
+ *      instead of display names.
+ * @property {string|Array.<string>} [filters] - The filters to be
+ *      used in filtering the list items using the $filter parameter. Can be a
+ *      string like "(Project eq 'Project 1') or (Project eq 'Project 2')", or
+ *      an array of strings like ["Project eq 'Project 1'", "Id eq 18"], each
+ *      of which will be concatenated automatically in the filter string using
+ *      the AND condition. To use OR condition, build the string manually.
  * @property {string} [listTitle] - The display name of the SharePoint list.
  * @property {number} [maxItems] - The maximum number of items to be returned
  *      from the list. If `recursiveFetch` is set to true, this is the
