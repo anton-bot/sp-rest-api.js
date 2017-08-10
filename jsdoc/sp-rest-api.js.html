@@ -46,6 +46,7 @@ var SpRestApi = function (options) {
      * The default options that will be used unless overridden.
      * @type {SpRestApiOptions}
      */
+    var digestField = document.getElementById('__REQUESTDIGEST');
     this.defaultOptions = {
         onsuccess: console.log,
         onerror: console.log,
@@ -54,9 +55,9 @@ var SpRestApi = function (options) {
         recursiveFetch: true,
         verbosity: SpRestApi.Verbosity.VERBOSE,
         siteUrl: _spPageContextInfo ? _spPageContextInfo.webAbsoluteUrl : '',
-        token: document.getElementById("__REQUESTDIGEST") ? 
-            document.getElementById("__REQUESTDIGEST").value : '',
+        token: digestField ? digestField.value : '',
         urls: {
+            context: '/_api/contextinfo',
             list: '/_api/web/lists/getbytitle(\'{0}\')/items',
             item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
             user: '/_api/Web/GetUserById({0})?$expand=Groups',
@@ -124,8 +125,8 @@ SpRestApi.prototype.options = {};
 
 /**
  * Array of cached SharePoint list items. Stores the data during the recursive
- * fetch (options.recursiveFetch = true), and is cleared immediately when the
- * recursive fetch completes.
+ * fetch (options.recursiveFetch = true), and is cleared after another
+ * fetch operation begins.
  * @type {Array.&lt;Object>}
  */
 SpRestApi.prototype.cachedListItems = [];
@@ -159,14 +160,14 @@ SpRestApi.prototype.config = function (options) {
  * Adds the $top= string to the specified URL, to limit the max number of
  * items in the response.
  * @param {string} url - the URL to add the $top string to.
- * @returns {string} The URL with the added "?"/"&amp;" character and the $top=
+ * @returns {string} The URL with the added '?'/'&amp;' character and the $top=
  *      URL parameter.
  */
 SpRestApi.prototype.addMaxItems = function (url) {
     // Add '?' or '&amp;' to URL query string
     url += url.includes('?') ? '&amp;' : '?';
 
-    return url + "$top=" + this.options.maxItems;
+    return url + '$top=' + this.options.maxItems;
 };
 
 /**
@@ -176,10 +177,12 @@ SpRestApi.prototype.addMaxItems = function (url) {
 SpRestApi.prototype.getAllItems = function () {
     var url = this.generateGetAllListItemsUrl();
 
+    this.cachedListItems = []; // reset cached items for recursive fetching
+
     var onsuccess;
     if (this.options.recursiveFetch) {
         // Continue fetching items recursively until we load the entire list:
-        onsuccess = this.continueRecursiveFetch;
+        onsuccess = $.proxy(this.continueRecursiveFetch, this);
     } else {
         onsuccess = this.options.onsuccess;        
     }
@@ -226,10 +229,12 @@ SpRestApi.prototype.getAllItemsFromListSubfolder = function (subfolderName) {
     var url = this.generateGetAllListItemsUrl();
     url += '&amp;$filter=substringof(\'' + fileref + '\', FileRef)';
 
+    this.cachedListItems = []; // reset cached items for recursive fetching
+
     var onsuccess;
     if (this.options.recursiveFetch) {
         // Continue fetching items recursively until we load the entire list:
-        onsuccess = this.continueRecursiveFetch;
+        onsuccess = $.proxy(this.continueRecursiveFetch, this); // save `this`
     } else {
         onsuccess = this.options.onsuccess;
     }
@@ -258,9 +263,10 @@ SpRestApi.prototype.continueRecursiveFetch = function (data) {
     this.cachedListItems = this.cachedListItems.concat(newData);
 
     if (nextUrl) {
-        // While next URL is not empty, keep loading recursively:
+        // While next URL is not empty, keep loading recursively. 
+        // Preserve `this` inside continueRecursiveFetch using $.proxy.
         this.loadUrl(nextUrl, 'GET',
-            this.continueRecursiveFetch, this.options.onerror);
+            $.proxy(this.continueRecursiveFetch, this), this.options.onerror);
     } else {
         // Load complete - generate a structure similar to server response, 
         // and call the callback.
@@ -287,7 +293,7 @@ SpRestApi.prototype.continueRecursiveFetch = function (data) {
  *      fetch.
  */
 SpRestApi.prototype.getItem = function (itemId) {
-    if (!itemId) { throw "The list item ID must not be empty."; }
+    if (!itemId) { throw 'The list item ID must not be empty.'; }
 
     var url = this.options.siteUrl +
         this.options.urls.item.format(this.options.listTitle, itemId);
@@ -301,7 +307,7 @@ SpRestApi.prototype.getItem = function (itemId) {
  */
 SpRestApi.prototype.createItem = function (item) {
     item.__metadata = {
-        "type": SpRestApi.getListItemType(this.options.listTitle)
+        'type': SpRestApi.getListItemType(this.options.listTitle)
     };
 
     var url = this.generateGetAllListItemsUrl();
@@ -320,7 +326,7 @@ SpRestApi.prototype.createItem = function (item) {
  */
 SpRestApi.prototype.updateItem = function (listItemId, item) {
     item.__metadata = {
-        "type": SpRestApi.getListItemType(this.options.listTitle)
+        'type': SpRestApi.getListItemType(this.options.listTitle)
     };
 
     var url = this.generateSingleListItemUrl(listItemId);
@@ -347,7 +353,7 @@ SpRestApi.prototype.deleteItem = function (itemId) {
  */
 SpRestApi.prototype.getUserById = function (userId) {
     if (!userId) {
-        throw "Tried to get user information using an empty user ID.";
+        throw 'Tried to get user information using an empty user ID.';
     }
 
     var url = this.options.urls.user.format(userId);
@@ -372,11 +378,11 @@ SpRestApi.prototype.getCurrentUser = function () {
  * @param {string} listTitle - The display name of the list where we are
  *      creating the new list item.
  * @returns {string} A SharePoint list item type which looks like
- *      "SP.Data.ProjectsListItem".
+ *      'SP.Data.ProjectsListItem'.
  * @static
  */
 SpRestApi.getListItemType = function (listTitle) {
-    var type = "SP.Data." + listTitle.capitalize() + "ListItem";
+    var type = 'SP.Data.{0}ListItem'.format(listTitle.capitalize());
     return SpRestApi.replaceSharepointSpecialChars(type);
 };
 
@@ -414,8 +420,8 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error, data) {
 
     // These headers are common for all requests
     var headers = {
-        "Accept": this.options.verbosity,
-        "X-RequestDigest": this.options.token,
+        'Accept': this.options.verbosity,
+        'X-RequestDigest': this.options.token,
     };
 
     // For the DELETE/MERGE methods, we actually send the request as POST
@@ -429,7 +435,7 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error, data) {
         url: url,
         type: method,
         cache: false,
-        data: data,
+        data: data ? JSON.stringify(data) : '',
         contentType: this.options.verbosity,
         headers: headers,
         success: function (response) {
@@ -448,23 +454,30 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error, data) {
  * - We are refreshing the token (which expires after 30 minutes).
  * @param {Function} callback - The callback to run after the authorization
  *      token is received successfully.
+ * Do not reuse the SpRestApi object that is used to refreshDigest to fetch
+ * other information, because onsuccess and onerror callbacks will be replaced.
+ * @throws an exception if the token could not be refreshed.
  */
 SpRestApi.prototype.refreshDigest = function (callback) {
-    var url = this.siteUrl + '/_api/contextinfo';
-
     // If request succeeded:
     var success = function (data) {
-        if (data &amp;&amp; data.d &amp;&amp; data.d.GetContextWebInformation &amp;&amp;
-            data.d.GetContextWebInformation.FormDigestValue) {
-            // If Verbosity = odata=verbose:
-            this.options = data.d.GetContextWebInformation.FormDigestValue;
-
-        } else if (data &amp;&amp; data.value &amp;&amp; data.value.GetContextWebInformation &amp;&amp;
-            data.value.GetContextWebInformation.FormDigestValue) { // TODO FIXME need to verify this path is correct in SP online
-            // If Verbosity = odata=nometadata, odata=minimalmetadata:
-            this.options = data.value.GetContextWebInformation.FormDigestValue;
-        } else {
-            throw 'Unable to obtain SharePoint authorization token.';
+        // Get token from the appropriate field in the response, and save
+        // it into this.options. We try to get it from two separate fields,
+        // only one of which should work (depending on API verbosity setting).
+        var token; 
+        try {
+            // If Verbosity was odata=verbose:
+            token = data.d.GetContextWebInformation.FormDigestValue;
+        } catch (ex) {
+            try {
+                // If Verbosity was odata=nometadata or odata=minimalmetadata:
+                // TODO FIXME need to verify this path is correct in SP online
+                token = data.value.GetContextWebInformation.FormDigestValue;
+            } catch (ex) {
+                throw 'Unable to obtain SharePoint authorization token.';
+            }
+        } finally {
+            if (token) { this.options.token = token; }
         }
 
         if (typeof callback === 'function') {
@@ -472,12 +485,24 @@ SpRestApi.prototype.refreshDigest = function (callback) {
         }
     };
 
+    // Preserve value of `this` as this SpRestApi instance:
+    this.options.onsuccess = $.proxy(success, this);
+
     // If request failed:
-    var error = function () {
+    this.options.onerror = function () {
         throw 'Unable to obtain SharePoint authorization token';
     };
 
-    this.loadUrl(url, 'POST', success, error);
+    this.getContextInfo();
+};
+
+/**
+ * Fetches the context information, most importantly authorization token
+ * and its expiration time.
+ */
+SpRestApi.prototype.getContextInfo = function () {
+    var url = this.siteUrl + this.options.urls.context;
+    this.loadUrl(url, 'POST', this.options.onsuccess, this.options.onerror);
 };
 
 
@@ -535,13 +560,13 @@ if (!String.prototype.capitalize) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SpRestApi.html">SpRestApi</a></li></ul><h3>Global</h3><ul><li><a href="global.html#defaultOptions">defaultOptions</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SpRestApi.html">SpRestApi</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Aug 09 2017 22:40:57 GMT+0800 (China Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Aug 10 2017 20:02:44 GMT+0800 (China Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
