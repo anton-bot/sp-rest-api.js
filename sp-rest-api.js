@@ -450,21 +450,6 @@ SpRestApi.prototype.refreshDigest = function (callback) {
             if (token) { this.options.token = token; }
         }
 
-        if (data) {
-            try
-            if (data.d && data.d.GetContextWebInformation &&
-                data.d.GetContextWebInformation.FormDigestValue) {
-                
-                
-            } else if (data.value && data.value.GetContextWebInformation &&
-                data.value.GetContextWebInformation.FormDigestValue) { 
-                
-                
-            }
-        } else {
-            
-        }
-
         if (typeof callback === 'function') {
             callback();
         }
