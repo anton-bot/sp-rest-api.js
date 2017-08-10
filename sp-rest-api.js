@@ -62,30 +62,30 @@ SpRestApi.Verbosity = {
 /**
  * @typedef {Object} SpRestApiOptions - The options passed to methods
  *      inside the SpRestApi class.
- * @property {Array.<SpRestApiFilterCriterion>} filters - The filters to be
+ * @property {Array.<SpRestApiFilterCriterion>} [filters] - The filters to be
  *      used in filtering the list items using the $filter parameter.
- * @property {string} [token] - The SharePoint's request digest, a token that
- *      it is required for every API call. Required only if using outside a
- *      SharePoint page, otherwise it is obtained automatically from DOM.
- * @property {Function} [onsuccess] - The callback function for successful
- *      requests to SharePoint REST API.
- * @property {Function} [onerror] - The callback function for failed requests
- *      to SharePoint REST API.
  * @property {string} [listTitle] - The display name of the SharePoint list.
  * @property {number} [maxItems] - The maximum number of items to be returned
  *      from the list. If `recursiveFetch` is set to true, this is the
  *      maximum number of items to fetch on each request to server. If not
  *      not specified, defaults to SharePoint's limit of 100. Maximum is
  *      5000 due to SharePoint limitations.
+ * @property {Function} [onsuccess] - The callback function for successful
+ *      requests to SharePoint REST API.
+ * @property {Function} [onerror] - The callback function for failed requests
+ *      to SharePoint REST API.
  * @property {boolean} [recursiveFetch] - Fetch all items from the list by
  *      repeatedly making server requests until all list items are fetched.
  *      This is to overcome SharePoint's limitation of maximum 5000 items
  *      per call.
- * @property {Verbosity} [verbosity] - The amount of metadata to be returned
- *      in the JSON response from server. Use the SpRestApi.Verbosity enum.
  * @property {string} [siteUrl] - The SharePoint site URL which is usually
  *      obtained from the _spPageContextInfo.webAbsoluteUrl. Required if using
  *      this library outside of a SharePoint page.
+ * @property {string} [token] - The SharePoint's request digest, a token that
+ *      it is required for every API call. Required only if using outside a
+ *      SharePoint page, otherwise it is obtained automatically from DOM.
+ * @property {Verbosity} [verbosity] - The amount of metadata to be returned
+ *      in the JSON response from server. Use the SpRestApi.Verbosity enum.
  * @property {Array.<string>} [urls] - The URLs of various API calls, e.g. to
  *      get a list item, all items in a list etc.
  */
