@@ -18,6 +18,7 @@ var SpRestApi = function (options) {
      * The default options that will be used unless overridden.
      * @type {SpRestApiOptions}
      */
+    var digestField = document.getElementById('__REQUESTDIGEST');
     this.defaultOptions = {
         onsuccess: console.log,
         onerror: console.log,
@@ -26,8 +27,7 @@ var SpRestApi = function (options) {
         recursiveFetch: true,
         verbosity: SpRestApi.Verbosity.VERBOSE,
         siteUrl: _spPageContextInfo ? _spPageContextInfo.webAbsoluteUrl : '',
-        token: document.getElementById("__REQUESTDIGEST") ? 
-            document.getElementById("__REQUESTDIGEST").value : '',
+        token: digestField ? digestField.value : '',
         urls: {
             list: '/_api/web/lists/getbytitle(\'{0}\')/items',
             item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
@@ -131,14 +131,14 @@ SpRestApi.prototype.config = function (options) {
  * Adds the $top= string to the specified URL, to limit the max number of
  * items in the response.
  * @param {string} url - the URL to add the $top string to.
- * @returns {string} The URL with the added "?"/"&" character and the $top=
+ * @returns {string} The URL with the added '?'/'&' character and the $top=
  *      URL parameter.
  */
 SpRestApi.prototype.addMaxItems = function (url) {
     // Add '?' or '&' to URL query string
     url += url.includes('?') ? '&' : '?';
 
-    return url + "$top=" + this.options.maxItems;
+    return url + '$top=' + this.options.maxItems;
 };
 
 /**
@@ -264,7 +264,7 @@ SpRestApi.prototype.continueRecursiveFetch = function (data) {
  *      fetch.
  */
 SpRestApi.prototype.getItem = function (itemId) {
-    if (!itemId) { throw "The list item ID must not be empty."; }
+    if (!itemId) { throw 'The list item ID must not be empty.'; }
 
     var url = this.options.siteUrl +
         this.options.urls.item.format(this.options.listTitle, itemId);
@@ -278,7 +278,7 @@ SpRestApi.prototype.getItem = function (itemId) {
  */
 SpRestApi.prototype.createItem = function (item) {
     item.__metadata = {
-        "type": SpRestApi.getListItemType(this.options.listTitle)
+        'type': SpRestApi.getListItemType(this.options.listTitle)
     };
 
     var url = this.generateGetAllListItemsUrl();
@@ -297,7 +297,7 @@ SpRestApi.prototype.createItem = function (item) {
  */
 SpRestApi.prototype.updateItem = function (listItemId, item) {
     item.__metadata = {
-        "type": SpRestApi.getListItemType(this.options.listTitle)
+        'type': SpRestApi.getListItemType(this.options.listTitle)
     };
 
     var url = this.generateSingleListItemUrl(listItemId);
@@ -324,7 +324,7 @@ SpRestApi.prototype.deleteItem = function (itemId) {
  */
 SpRestApi.prototype.getUserById = function (userId) {
     if (!userId) {
-        throw "Tried to get user information using an empty user ID.";
+        throw 'Tried to get user information using an empty user ID.';
     }
 
     var url = this.options.urls.user.format(userId);
@@ -349,11 +349,11 @@ SpRestApi.prototype.getCurrentUser = function () {
  * @param {string} listTitle - The display name of the list where we are
  *      creating the new list item.
  * @returns {string} A SharePoint list item type which looks like
- *      "SP.Data.ProjectsListItem".
+ *      'SP.Data.ProjectsListItem'.
  * @static
  */
 SpRestApi.getListItemType = function (listTitle) {
-    var type = "SP.Data." + listTitle.capitalize() + "ListItem";
+    var type = 'SP.Data.{0}ListItem'.format(listTitle.capitalize());
     return SpRestApi.replaceSharepointSpecialChars(type);
 };
 
@@ -391,8 +391,8 @@ SpRestApi.prototype.loadUrl = function (url, method, success, error, data) {
 
     // These headers are common for all requests
     var headers = {
-        "Accept": this.options.verbosity,
-        "X-RequestDigest": this.options.token,
+        'Accept': this.options.verbosity,
+        'X-RequestDigest': this.options.token,
     };
 
     // For the DELETE/MERGE methods, we actually send the request as POST
