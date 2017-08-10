@@ -431,17 +431,38 @@ SpRestApi.prototype.refreshDigest = function (callback) {
 
     // If request succeeded:
     var success = function (data) {
-        if (data && data.d && data.d.GetContextWebInformation &&
-            data.d.GetContextWebInformation.FormDigestValue) {
-            // If Verbosity = odata=verbose:
-            this.options = data.d.GetContextWebInformation.FormDigestValue;
+        // Get token from the appropriate field in the response, and save
+        // it into this.options. We try to get it from two separate fields,
+        // only one of which should work (depending on API verbosity setting).
+        var token; 
+        try {
+            // If Verbosity was odata=verbose:
+            token = data.d.GetContextWebInformation.FormDigestValue;
+        } catch (ex) {
+            try {
+                // If Verbosity was odata=nometadata or odata=minimalmetadata:
+                // TODO FIXME need to verify this path is correct in SP online
+                token = data.value.GetContextWebInformation.FormDigestValue;
+            } catch (ex) {
+                throw 'Unable to obtain SharePoint authorization token.';
+            }
+        } finally {
+            if (token) { this.options.token = token; }
+        }
 
-        } else if (data && data.value && data.value.GetContextWebInformation &&
-            data.value.GetContextWebInformation.FormDigestValue) { // TODO FIXME need to verify this path is correct in SP online
-            // If Verbosity = odata=nometadata, odata=minimalmetadata:
-            this.options = data.value.GetContextWebInformation.FormDigestValue;
+        if (data) {
+            try
+            if (data.d && data.d.GetContextWebInformation &&
+                data.d.GetContextWebInformation.FormDigestValue) {
+                
+                
+            } else if (data.value && data.value.GetContextWebInformation &&
+                data.value.GetContextWebInformation.FormDigestValue) { 
+                
+                
+            }
         } else {
-            throw 'Unable to obtain SharePoint authorization token.';
+            
         }
 
         if (typeof callback === 'function') {
@@ -454,7 +475,7 @@ SpRestApi.prototype.refreshDigest = function (callback) {
         throw 'Unable to obtain SharePoint authorization token';
     };
 
-    this.loadUrl(url, 'POST', success, error);
+    this.loadUrl(url, 'POST', $.proxy(success, this), error);
 };
 
 
