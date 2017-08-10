@@ -96,8 +96,8 @@ SpRestApi.prototype.options = {};
 
 /**
  * Array of cached SharePoint list items. Stores the data during the recursive
- * fetch (options.recursiveFetch = true), and is cleared immediately when the
- * recursive fetch completes.
+ * fetch (options.recursiveFetch = true), and is cleared after another
+ * fetch operation begins.
  * @type {Array.<Object>}
  */
 SpRestApi.prototype.cachedListItems = [];
@@ -148,10 +148,12 @@ SpRestApi.prototype.addMaxItems = function (url) {
 SpRestApi.prototype.getAllItems = function () {
     var url = this.generateGetAllListItemsUrl();
 
+    this.cachedListItems = []; // reset cached items for recursive fetching
+
     var onsuccess;
     if (this.options.recursiveFetch) {
         // Continue fetching items recursively until we load the entire list:
-        onsuccess = this.continueRecursiveFetch;
+        onsuccess = $.proxy(this.continueRecursiveFetch, this);
     } else {
         onsuccess = this.options.onsuccess;        
     }
@@ -198,10 +200,12 @@ SpRestApi.prototype.getAllItemsFromListSubfolder = function (subfolderName) {
     var url = this.generateGetAllListItemsUrl();
     url += '&$filter=substringof(\'' + fileref + '\', FileRef)';
 
+    this.cachedListItems = []; // reset cached items for recursive fetching
+
     var onsuccess;
     if (this.options.recursiveFetch) {
         // Continue fetching items recursively until we load the entire list:
-        onsuccess = this.continueRecursiveFetch;
+        onsuccess = $.proxy(this.continueRecursiveFetch, this); // save `this`
     } else {
         onsuccess = this.options.onsuccess;
     }
@@ -230,9 +234,10 @@ SpRestApi.prototype.continueRecursiveFetch = function (data) {
     this.cachedListItems = this.cachedListItems.concat(newData);
 
     if (nextUrl) {
-        // While next URL is not empty, keep loading recursively:
+        // While next URL is not empty, keep loading recursively. 
+        // Preserve `this` inside continueRecursiveFetch using $.proxy.
         this.loadUrl(nextUrl, 'GET',
-            this.continueRecursiveFetch, this.options.onerror);
+            $.proxy(this.continueRecursiveFetch, this), this.options.onerror);
     } else {
         // Load complete - generate a structure similar to server response, 
         // and call the callback.
