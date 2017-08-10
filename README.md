@@ -118,6 +118,7 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 
 #### Utilities
 
+- `getContextInfo()` - fetch context information, including the authorization token.
 - `refreshDigest()` - gets a new the SharePoint security validation / token, and stores it in the `options`.
 
 #### Internal methods
