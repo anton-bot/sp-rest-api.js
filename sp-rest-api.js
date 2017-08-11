@@ -581,7 +581,7 @@ if (!Array.prototype.compact) {
     Array.prototype.compact = function () {
         return this.filter(function (element) {
             // remove all falsy values except 0 and false
-            return e === 0 || e === false || e;
+            return element === 0 || element === false || element;
         });
     };
 }
