@@ -22,10 +22,10 @@ var SpRestApi = function (options) {
     this.defaultOptions = {
         expand: [],
         filters: [],
-        onsuccess: console.log,
-        onerror: console.log,
         listTitle: '',
         maxItems: 100,
+        onsuccess: console.log,
+        onerror: console.log,
         recursiveFetch: true,
         select: [],
         siteUrl: _spPageContextInfo ? _spPageContextInfo.webAbsoluteUrl : '',
@@ -88,7 +88,7 @@ SpRestApi.Verbosity = {
  *      repeatedly making server requests until all list items are fetched.
  *      This is to overcome SharePoint's limitation of maximum 5000 items
  *      per call.
- * @property {string|Array.<string>} select - Which columns to select from a
+ * @property {string|Array.<string>} [select] - Which columns to select from a
  *      list (instead of fetching all columns). If the value is string, it must
  *      be in the format 'Id,Title,Status,CompletionDate,Approver/Title'. If
  *      the value is an array, it must be an array of strings like ['Id',
@@ -186,6 +186,8 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
     var url = this.options.siteUrl +
         this.options.urls.list.format(this.options.listTitle);
     url = this.addMaxItems(url);
+    url = SpRestApi.appendSelectQueryString(url, this.options.select);
+
     return url;
 };
 
@@ -195,8 +197,33 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
  * @returns {string} An URL ending with e.g. /Lists('MyList')/Items(761)
  */
 SpRestApi.prototype.generateSingleListItemUrl = function (itemId) {
-    return this.options.siteUrl +
+    var baseUrl = this.options.siteUrl +
         this.options.urls.item.format(this.options.listTitle, itemId);
+
+    url = appendSelectQueryString(url, this.options.select);
+
+    return url;
+};
+
+/**
+ * Appends the $select query string to the SharePoint REST API URL.
+ * @param {string} url - The base URL to which we need to append the string.
+ *      May contain other query string parameters.
+ * @param {string|Array.<string>} select - Which columns to select from a
+ *      list (instead of fetching all columns).
+ * @returns {string} An URL like "...?$select=Id,Title,Approver/Title".
+ */
+SpRestApi.appendSelectQueryString = function (url, select) {
+    if (!select) { return url; }
+
+    if (select instanceof Array) {
+        select = select.join(',');
+    }
+
+    // Decide whether to use ? or & for separating query string params
+    var separator = url.includes('?') ? '&' : '?';
+
+    url += separator + '$select=' + select;
 };
 
 /**
