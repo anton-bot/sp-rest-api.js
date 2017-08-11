@@ -124,6 +124,7 @@ See the [jsdoc](https://github.com/J3QQ4/sp-rest-api.js/blob/master/jsdoc/SpRest
 #### Internal methods
 
 - `addMaxItems()` - adds `$top` parameter to URL.
+- `appendSelectQueryString()` - adds the `$select=` parameter in the URL string.
 - `loadUrl()` - fetches the specified URL.
 - `generateSingleListItemUrl()` - generates the API URL to fetch/delete a single list item
 - `generateGetAllListItemsUrl()` - generates the API URL to fetch all items from a list
