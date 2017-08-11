@@ -537,7 +537,7 @@ SpRestApi.prototype.getContextInfo = function () {
  *      empty string value removed.
  */
 SpRestApi.compactArray = function (sourceArray) {
-    return this.filter(function (element) {
+    return sourceArray.filter(function (element) {
         // remove all falsy values except 0 and false
         return element === 0 || element === false || element;
     });
