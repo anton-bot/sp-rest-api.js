@@ -153,42 +153,16 @@
 
         <tr>
             
-                <td class="name"><code>filters</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;SpRestApiFilterCriterion></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">The filters to be     used in filtering the list items using the $filter parameter.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>token</code></td>
+                <td class="name"><code>expand</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">string</span>
+|
+
+<span class="param-type"><a href="Array.html">Array</a>.&lt;string></span>
 
 
             
@@ -206,20 +180,23 @@
 
             
 
-            <td class="description last">The SharePoint's request digest, a token that     it is required for every API call. Required only if using outside a     SharePoint page, otherwise it is obtained automatically from DOM.</td>
+            <td class="description last">The columns to be expanded,     e.g. lookup columns or people/group columns. Use internal column names     instead of display names.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>onsuccess</code></td>
+                <td class="name"><code>filters</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">function</span>
+<span class="param-type">string</span>
+|
+
+<span class="param-type"><a href="Array.html">Array</a>.&lt;string></span>
 
 
             
@@ -237,38 +214,7 @@
 
             
 
-            <td class="description last">The callback function for successful     requests to SharePoint REST API.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>onerror</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">The callback function for failed requests     to SharePoint REST API.</td>
+            <td class="description last">The filters to be     used in filtering the list items using the $filter parameter. Can be a     string like "(Project eq 'Project 1') or (Project eq 'Project 2')", or     an array of strings like ["Project eq 'Project 1'", "Id eq 18"], each     of which will be concatenated automatically in the filter string using     the AND condition. To use OR condition, build the string manually.</td>
         </tr>
 
     
@@ -337,6 +283,68 @@
 
         <tr>
             
+                <td class="name"><code>onsuccess</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The callback function for successful     requests to SharePoint REST API.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onerror</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The callback function for failed requests     to SharePoint REST API.</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>recursiveFetch</code></td>
             
 
@@ -368,13 +376,16 @@
 
         <tr>
             
-                <td class="name"><code>verbosity</code></td>
+                <td class="name"><code>select</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#Verbosity">Verbosity</a></span>
+<span class="param-type">string</span>
+|
+
+<span class="param-type"><a href="Array.html">Array</a>.&lt;string></span>
 
 
             
@@ -392,7 +403,7 @@
 
             
 
-            <td class="description last">The amount of metadata to be returned     in the JSON response from server. Use the SpRestApi.Verbosity enum.</td>
+            <td class="description last">Which columns to select from a     list (instead of fetching all columns). If the value is string, it must     be in the format 'Id,Title,Status,CompletionDate,Approver/Title'. If     the value is an array, it must be an array of strings like ['Id',     'Title', 'Status', 'CompletionDate', 'Approver/Title'].</td>
         </tr>
 
     
@@ -430,13 +441,75 @@
 
         <tr>
             
+                <td class="name"><code>token</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The SharePoint's request digest, a token that     it is required for every API call. Required only if using outside a     SharePoint page, otherwise it is obtained automatically from DOM.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>verbosity</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Verbosity">Verbosity</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The amount of metadata to be returned     in the JSON response from server. Use the SpRestApi.Verbosity enum.</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>urls</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;string></span>
+<span class="param-type"><a href="Array.html">Array</a>.&lt;string></span>
 
 
             
@@ -493,7 +566,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line62">line 62</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line65">line 65</a>
     </li></ul></dd>
     
 
@@ -565,7 +638,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line42">line 42</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line45">line 45</a>
     </li></ul></dd>
     
 
@@ -601,7 +674,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Aug 10 2017 20:02:44 GMT+0800 (China Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Aug 11 2017 14:55:38 GMT+0800 (China Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

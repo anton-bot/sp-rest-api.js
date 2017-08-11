@@ -48,12 +48,14 @@ var SpRestApi = function (options) {
      */
     var digestField = document.getElementById('__REQUESTDIGEST');
     this.defaultOptions = {
-        onsuccess: console.log,
-        onerror: console.log,
+        expand: [],
+        filters: [],
         listTitle: '',
         maxItems: 100,
+        onsuccess: console.log,
+        onerror: console.log,
         recursiveFetch: true,
-        verbosity: SpRestApi.Verbosity.VERBOSE,
+        select: [],
         siteUrl: _spPageContextInfo ? _spPageContextInfo.webAbsoluteUrl : '',
         token: digestField ? digestField.value : '',
         urls: {
@@ -62,6 +64,7 @@ var SpRestApi = function (options) {
             item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
             user: '/_api/Web/GetUserById({0})?$expand=Groups',
         },
+        verbosity: SpRestApi.Verbosity.VERBOSE,
     };
 
     this.options = $.extend(this.defaultOptions, options);
@@ -90,30 +93,42 @@ SpRestApi.Verbosity = {
 /**
  * @typedef {Object} SpRestApiOptions - The options passed to methods
  *      inside the SpRestApi class.
- * @property {Array.&lt;SpRestApiFilterCriterion>} filters - The filters to be
- *      used in filtering the list items using the $filter parameter.
- * @property {string} [token] - The SharePoint's request digest, a token that
- *      it is required for every API call. Required only if using outside a
- *      SharePoint page, otherwise it is obtained automatically from DOM.
- * @property {Function} [onsuccess] - The callback function for successful
- *      requests to SharePoint REST API.
- * @property {Function} [onerror] - The callback function for failed requests
- *      to SharePoint REST API.
+ * @property {string|Array.&lt;string>} [expand] - The columns to be expanded,
+ *      e.g. lookup columns or people/group columns. Use internal column names
+ *      instead of display names.
+ * @property {string|Array.&lt;string>} [filters] - The filters to be
+ *      used in filtering the list items using the $filter parameter. Can be a
+ *      string like "(Project eq 'Project 1') or (Project eq 'Project 2')", or
+ *      an array of strings like ["Project eq 'Project 1'", "Id eq 18"], each
+ *      of which will be concatenated automatically in the filter string using
+ *      the AND condition. To use OR condition, build the string manually.
  * @property {string} [listTitle] - The display name of the SharePoint list.
  * @property {number} [maxItems] - The maximum number of items to be returned
  *      from the list. If `recursiveFetch` is set to true, this is the
  *      maximum number of items to fetch on each request to server. If not
  *      not specified, defaults to SharePoint's limit of 100. Maximum is
  *      5000 due to SharePoint limitations.
+ * @property {Function} [onsuccess] - The callback function for successful
+ *      requests to SharePoint REST API.
+ * @property {Function} [onerror] - The callback function for failed requests
+ *      to SharePoint REST API.
  * @property {boolean} [recursiveFetch] - Fetch all items from the list by
  *      repeatedly making server requests until all list items are fetched.
  *      This is to overcome SharePoint's limitation of maximum 5000 items
  *      per call.
- * @property {Verbosity} [verbosity] - The amount of metadata to be returned
- *      in the JSON response from server. Use the SpRestApi.Verbosity enum.
+ * @property {string|Array.&lt;string>} [select] - Which columns to select from a
+ *      list (instead of fetching all columns). If the value is string, it must
+ *      be in the format 'Id,Title,Status,CompletionDate,Approver/Title'. If
+ *      the value is an array, it must be an array of strings like ['Id',
+ *      'Title', 'Status', 'CompletionDate', 'Approver/Title'].
  * @property {string} [siteUrl] - The SharePoint site URL which is usually
  *      obtained from the _spPageContextInfo.webAbsoluteUrl. Required if using
  *      this library outside of a SharePoint page.
+ * @property {string} [token] - The SharePoint's request digest, a token that
+ *      it is required for every API call. Required only if using outside a
+ *      SharePoint page, otherwise it is obtained automatically from DOM.
+ * @property {Verbosity} [verbosity] - The amount of metadata to be returned
+ *      in the JSON response from server. Use the SpRestApi.Verbosity enum.
  * @property {Array.&lt;string>} [urls] - The URLs of various API calls, e.g. to
  *      get a list item, all items in a list etc.
  */
@@ -199,6 +214,8 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
     var url = this.options.siteUrl +
         this.options.urls.list.format(this.options.listTitle);
     url = this.addMaxItems(url);
+    url = SpRestApi.appendSelectQueryString(url, this.options.select);
+
     return url;
 };
 
@@ -208,8 +225,33 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
  * @returns {string} An URL ending with e.g. /Lists('MyList')/Items(761)
  */
 SpRestApi.prototype.generateSingleListItemUrl = function (itemId) {
-    return this.options.siteUrl +
+    var url = this.options.siteUrl +
         this.options.urls.item.format(this.options.listTitle, itemId);
+
+    url = appendSelectQueryString(url, this.options.select);
+
+    return url;
+};
+
+/**
+ * Appends the $select query string to the SharePoint REST API URL.
+ * @param {string} url - The base URL to which we need to append the string.
+ *      May contain other query string parameters.
+ * @param {string|Array.&lt;string>} select - Which columns to select from a
+ *      list (instead of fetching all columns).
+ * @returns {string} An URL like "...?$select=Id,Title,Approver/Title".
+ */
+SpRestApi.appendSelectQueryString = function (url, select) {
+    if (!select) { return url; }
+
+    if (select instanceof Array) {
+        select = select.compact().join(',');
+    }
+
+    // Decide whether to use ? or &amp; for separating query string params
+    var separator = url.includes('?') ? '&amp;' : '?';
+
+    return url + separator + '$select=' + select;
 };
 
 /**
@@ -249,6 +291,13 @@ SpRestApi.prototype.getAllItemsFromListSubfolder = function (subfolderName) {
 SpRestApi.prototype.continueRecursiveFetch = function (data) {
     var newData;
     var nextUrl;
+
+    // data must not be empty, and must contain either .d or .value. 
+    // Otherwise it's likely the server error.
+    if (!data || !(data.d || data.value)) {
+        this.options.onerror(data);
+        return;
+    }
 
     // Depending on the Verbosity setting, the data will be returned in
     // significantly different formats (inside data.d.results or data.value).
@@ -550,6 +599,19 @@ if (!String.prototype.capitalize) {
             return letter.toUpperCase();
         });
     };
+}
+
+if (!Array.prototype.compact) {
+    /**
+     * Removes undefined, null and empty string '' values from the array and
+     * returns a newly created array.
+     */
+    Array.prototype.compact = function () {
+        return this.filter(function (element) {
+            // remove all falsy values except 0 and false
+            return element === 0 || element === false || element;
+        });
+    };
 }</code></pre>
         </article>
     </section>
@@ -566,7 +628,7 @@ if (!String.prototype.capitalize) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Aug 10 2017 20:02:44 GMT+0800 (China Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Aug 11 2017 14:55:38 GMT+0800 (China Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
