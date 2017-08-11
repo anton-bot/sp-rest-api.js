@@ -197,7 +197,7 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
  * @returns {string} An URL ending with e.g. /Lists('MyList')/Items(761)
  */
 SpRestApi.prototype.generateSingleListItemUrl = function (itemId) {
-    var baseUrl = this.options.siteUrl +
+    var url = this.options.siteUrl +
         this.options.urls.item.format(this.options.listTitle, itemId);
 
     url = appendSelectQueryString(url, this.options.select);
