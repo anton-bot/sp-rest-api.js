@@ -20,12 +20,14 @@ var SpRestApi = function (options) {
      */
     var digestField = document.getElementById('__REQUESTDIGEST');
     this.defaultOptions = {
+        expand: [],
+        filters: [],
         onsuccess: console.log,
         onerror: console.log,
         listTitle: '',
         maxItems: 100,
         recursiveFetch: true,
-        verbosity: SpRestApi.Verbosity.VERBOSE,
+        select: [],
         siteUrl: _spPageContextInfo ? _spPageContextInfo.webAbsoluteUrl : '',
         token: digestField ? digestField.value : '',
         urls: {
@@ -34,6 +36,7 @@ var SpRestApi = function (options) {
             item: '/_api/web/lists/getbytitle(\'{0}\')/items({1})',
             user: '/_api/Web/GetUserById({0})?$expand=Groups',
         },
+        verbosity: SpRestApi.Verbosity.VERBOSE,
     };
 
     this.options = $.extend(this.defaultOptions, options);
@@ -85,6 +88,11 @@ SpRestApi.Verbosity = {
  *      repeatedly making server requests until all list items are fetched.
  *      This is to overcome SharePoint's limitation of maximum 5000 items
  *      per call.
+ * @property {string|Array.<string>} select - Which columns to select from a
+ *      list (instead of fetching all columns). If the value is string, it must
+ *      be in the format 'Id,Title,Status,CompletionDate,Approver/Title'. If
+ *      the value is an array, it must be an array of strings like ['Id',
+ *      'Title', 'Status', 'CompletionDate', 'Approver/Title'].
  * @property {string} [siteUrl] - The SharePoint site URL which is usually
  *      obtained from the _spPageContextInfo.webAbsoluteUrl. Required if using
  *      this library outside of a SharePoint page.
