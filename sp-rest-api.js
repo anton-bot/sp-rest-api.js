@@ -223,7 +223,7 @@ SpRestApi.appendSelectQueryString = function (url, select) {
     // Decide whether to use ? or & for separating query string params
     var separator = url.includes('?') ? '&' : '?';
 
-    url += separator + '$select=' + select;
+    return url + separator + '$select=' + select;
 };
 
 /**
