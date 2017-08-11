@@ -217,7 +217,7 @@ SpRestApi.appendSelectQueryString = function (url, select) {
     if (!select) { return url; }
 
     if (select instanceof Array) {
-        select = select.join(',');
+        select = select.compact().join(',');
     }
 
     // Decide whether to use ? or & for separating query string params
@@ -569,6 +569,19 @@ if (!String.prototype.capitalize) {
     String.prototype.capitalize = function () {
         return this.replace(/\b[a-z]/g, function (letter) {
             return letter.toUpperCase();
+        });
+    };
+}
+
+if (!Array.prototype.compact) {
+    /**
+     * Removes undefined, null and empty string '' values from the array and
+     * returns a newly created array.
+     */
+    Array.prototype.compact = function () {
+        return this.filter(function (element) {
+            // remove all falsy values except 0 and false
+            return e === 0 || e === false || e;
         });
     };
 }
