@@ -264,6 +264,13 @@ SpRestApi.prototype.continueRecursiveFetch = function (data) {
     var newData;
     var nextUrl;
 
+    // data must not be empty, and must contain either .d or .value. 
+    // Otherwise it's likely the server error.
+    if (!data || !(data.d || data.value)) {
+        this.options.onerror(data);
+        return;
+    }
+
     // Depending on the Verbosity setting, the data will be returned in
     // significantly different formats (inside data.d.results or data.value).
     if (this.options.verbosity === SpRestApi.Verbosity.VERBOSE) {
