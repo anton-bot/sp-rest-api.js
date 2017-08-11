@@ -217,7 +217,7 @@ SpRestApi.appendSelectQueryString = function (url, select) {
     if (!select) { return url; }
 
     if (select instanceof Array) {
-        select = select.compact().join(',');
+        select = SpRestApi.compactArray(select).join(',');
     }
 
     // Decide whether to use ? or & for separating query string params
@@ -526,6 +526,23 @@ SpRestApi.prototype.getContextInfo = function () {
     this.loadUrl(url, 'POST', this.options.onsuccess, this.options.onerror);
 };
 
+/**
+ * Removes undefined, null and empty string '' values from the array and
+ * returns a newly created array. Ideally we'd extend the Array.prototype with
+ * this method, but due to a bug in SharePoint's wpadder.debug.js it is not
+ * possible. See https://medium.com/@anton_ivanov/8e0dda134f79
+ * @param {Array.<any>} sourceArray - An array that possibly contains empty
+ *      strings, undefined or null values.
+ * @returns {Array.<any>} A copy of the array with the null, undefined and
+ *      empty string value removed.
+ */
+SpRestApi.compactArray = function (sourceArray) {
+    return this.filter(function (element) {
+        // remove all falsy values except 0 and false
+        return element === 0 || element === false || element;
+    });
+};
+
 
 /* Polyfills
 -----------------------------*/
@@ -569,19 +586,6 @@ if (!String.prototype.capitalize) {
     String.prototype.capitalize = function () {
         return this.replace(/\b[a-z]/g, function (letter) {
             return letter.toUpperCase();
-        });
-    };
-}
-
-if (!Array.prototype.compact) {
-    /**
-     * Removes undefined, null and empty string '' values from the array and
-     * returns a newly created array.
-     */
-    Array.prototype.compact = function () {
-        return this.filter(function (element) {
-            // remove all falsy values except 0 and false
-            return element === 0 || element === false || element;
         });
     };
 }
