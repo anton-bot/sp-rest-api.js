@@ -200,7 +200,7 @@
 
         
             
-<h4 class="name" id="cachedListItems"><span class="type-signature"></span>cachedListItems<span class="type-signature"> :<a href="Array.html">Array</a>.&lt;Object></span></h4>
+<h4 class="name" id="cachedListItems"><span class="type-signature"></span>cachedListItems<span class="type-signature"> :Array.&lt;Object></span></h4>
 
 
 
@@ -215,7 +215,7 @@
     <ul>
         <li>
             
-<span class="param-type"><a href="Array.html">Array</a>.&lt;Object></span>
+<span class="param-type">Array.&lt;Object></span>
 
 
         </li>
@@ -425,6 +425,185 @@
 
     
 
+    <h4 class="name" id=".appendFilters"><span class="type-signature">(static) </span>appendFilters<span class="signature">(url, filters)</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Appends the $filter query string to the SharePoint REST API URL.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The base URL to which we need to append the string.     May contain other query string parameters.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>filters</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">Array.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Which columns to select from a     list (instead of fetching all columns).</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line238">line 238</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An URL with a string lie "...?$Filter=Title eq 'Test'".
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id=".appendSelectQueryString"><span class="type-signature">(static) </span>appendSelectQueryString<span class="signature">(url, select)</span><span class="type-signature"> &rarr; {string}</span></h4>
 
     
@@ -500,7 +679,7 @@
 <span class="param-type">string</span>
 |
 
-<span class="param-type"><a href="Array.html">Array</a>.&lt;string></span>
+<span class="param-type">Array.&lt;string></span>
 
 
             
@@ -551,7 +730,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line216">line 216</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line217">line 217</a>
     </li></ul></dd>
     
 
@@ -590,6 +769,159 @@
     <dd>
         
 <span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".compactArray"><span class="type-signature">(static) </span>compactArray<span class="signature">(sourceArray)</span><span class="type-signature"> &rarr; {Array.&lt;any>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Removes undefined, null and empty string '' values from the array andreturns a newly created array. Ideally we'd extend the Array.prototype withthis method, but due to a bug in SharePoint's wpadder.debug.js it is notpossible. See https://medium.com/@anton_ivanov/8e0dda134f79
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sourceArray</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;any></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An array that possibly contains empty     strings, undefined or null values.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line579">line 579</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A copy of the array with the null, undefined and     empty string value removed.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;any></span>
 
 
     </dd>
@@ -704,7 +1036,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line405">line 405</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line445">line 445</a>
     </li></ul></dd>
     
 
@@ -857,7 +1189,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line420">line 420</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line460">line 460</a>
     </li></ul></dd>
     
 
@@ -1267,7 +1599,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line263">line 263</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line303">line 303</a>
     </li></ul></dd>
     
 
@@ -1398,7 +1730,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line329">line 329</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line369">line 369</a>
     </li></ul></dd>
     
 
@@ -1529,7 +1861,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line364">line 364</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line404">line 404</a>
     </li></ul></dd>
     
 
@@ -1764,7 +2096,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line199">line 199</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line200">line 200</a>
     </li></ul></dd>
     
 
@@ -1999,7 +2331,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line235">line 235</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line266">line 266</a>
     </li></ul></dd>
     
 
@@ -2081,7 +2413,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line524">line 524</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line564">line 564</a>
     </li></ul></dd>
     
 
@@ -2163,7 +2495,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line389">line 389</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line429">line 429</a>
     </li></ul></dd>
     
 
@@ -2294,7 +2626,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line316">line 316</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line356">line 356</a>
     </li></ul></dd>
     
 
@@ -2425,7 +2757,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line375">line 375</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line415">line 415</a>
     </li></ul></dd>
     
 
@@ -2845,7 +3177,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line438">line 438</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line478">line 478</a>
     </li></ul></dd>
     
 
@@ -2976,7 +3308,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line482">line 482</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line522">line 522</a>
     </li></ul></dd>
     
 
@@ -3142,7 +3474,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line348">line 348</a>
+        <a href="sp-rest-api.js.html">sp-rest-api.js</a>, <a href="sp-rest-api.js.html#line388">line 388</a>
     </li></ul></dd>
     
 
@@ -3190,7 +3522,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Aug 11 2017 14:55:38 GMT+0800 (China Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Aug 16 2017 17:08:49 GMT+0800 (China Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
