@@ -187,6 +187,7 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
         this.options.urls.list.format(this.options.listTitle);
     url = this.addMaxItems(url);
     url = SpRestApi.appendSelectQueryString(url, this.options.select);
+    url = SpRestApi.appendFilters(url, this.options.filters);
 
     return url;
 };
@@ -200,7 +201,7 @@ SpRestApi.prototype.generateSingleListItemUrl = function (itemId) {
     var url = this.options.siteUrl +
         this.options.urls.item.format(this.options.listTitle, itemId);
 
-    url = appendSelectQueryString(url, this.options.select);
+    url = SpRestApi.appendSelectQueryString(url, this.options.select);
 
     return url;
 };
@@ -227,6 +228,36 @@ SpRestApi.appendSelectQueryString = function (url, select) {
 };
 
 /**
+ * Appends the $filter query string to the SharePoint REST API URL.
+ * @param {string} url - The base URL to which we need to append the string.
+ *      May contain other query string parameters.
+ * @param {string|Array.<string>} filters - Which columns to select from a
+ *      list (instead of fetching all columns).
+ * @returns {string} An URL with a string lie "...?$Filter=Title eq 'Test'".
+ */
+SpRestApi.appendFilters = function (url, filters) {
+    if (!filters) { return url; }
+
+    if (filters instanceof Array) {
+        // Remove empty values: 
+        filters = SpRestApi.compactArray(filters);
+
+        // Enclose each item in brackets and concatenate with 'AND':
+        filters.forEach(function (filter, i) {
+            filters[i] = '(' + filter + ')';
+        });
+
+        // Concatenate filters with AND condition
+        filters = filters.join(' and ');
+    }
+
+    // Decide whether to use ? or & for separating query string params
+    var separator = url.includes('?') ? '&' : '?';
+
+    return url + separator + '$filter=' + filters;
+};
+
+/**
  * Returns all list items from a subfolder of a SharePoint list. Uses a hacky
  * way - by matching a substring of the FileRef, to avoid relying on CAML.
  * @param {string} subfolderName - The display name of the subfolder in a list.
@@ -240,8 +271,17 @@ SpRestApi.prototype.getAllItemsFromListSubfolder = function (subfolderName) {
     var fileref = 'Lists/' +
         this.options.listTitle + '/' + subfolderName + '/';
 
+    // Add filter to general options
+    var filter = 'substringof(\'' + fileref + '\', FileRef)';
+    if (this.options.filters instanceof Array) {
+        this.options.filters.push(filter);
+    } else if (this.options.filters instanceof String) {
+        this.options.filters += ' and (' + filter + ')';
+    } else {
+        this.options.filters = [filter];
+    }
+
     var url = this.generateGetAllListItemsUrl();
-    url += '&$filter=substringof(\'' + fileref + '\', FileRef)';
 
     this.cachedListItems = []; // reset cached items for recursive fetching
 
