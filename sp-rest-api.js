@@ -188,6 +188,7 @@ SpRestApi.prototype.generateGetAllListItemsUrl = function () {
     url = this.addMaxItems(url);
     url = SpRestApi.appendSelectQueryString(url, this.options.select);
     url = SpRestApi.appendFilters(url, this.options.filters);
+    url = SpRestApi.appendExpand(url,this.options.expand);
 
     return url;
 };
@@ -202,6 +203,7 @@ SpRestApi.prototype.generateSingleListItemUrl = function (itemId) {
         this.options.urls.item.format(this.options.listTitle, itemId);
 
     url = SpRestApi.appendSelectQueryString(url, this.options.select);
+    url = SpRestApi.appendExpand(url,this.options.expand);
 
     return url;
 };
@@ -256,6 +258,36 @@ SpRestApi.appendFilters = function (url, filters) {
 
     return url + separator + '$filter=' + filters;
 };
+
+/**
+ * Appends the $filter query string to the SharePoint REST API URL.
+ * @param {string} url - The base URL to which we need to append the string.
+ *      May contain other query string parameters.
+ * @param {string|Array.<string>} expand - Which columns to expand
+ * @returns {string} An URL with a string lie "...?$Filter=Title eq 'Test'".
+ */
+SpRestApi.appendExpand = function (url, expand) {
+    if (!expand) { return url; }
+    
+    if (expand instanceof Array) {
+        // Remove empty values: 
+        expand = SpRestApi.compactArray(expand);
+
+        // Enclose each item in brackets and concatenate with 'AND':
+        expand.forEach(function (expand, i) {
+            expand[i] = '(' + expand + ')';
+        });
+
+        // Concatenate filters with AND condition
+        expand = expand.join(',');
+    }
+
+    // Decide whether to use ? or & for separating query string params
+    var separator = url.includes('?') ? '&' : '?';
+
+    return url + separator + '$expand=' + expand;
+}
+
 
 /**
  * Returns all list items from a subfolder of a SharePoint list. Uses a hacky
