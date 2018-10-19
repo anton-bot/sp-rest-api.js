@@ -235,7 +235,7 @@ SpRestApi.appendSelectQueryString = function (url, select) {
  *      May contain other query string parameters.
  * @param {string|Array.<string>} filters - Which columns to select from a
  *      list (instead of fetching all columns).
- * @returns {string} An URL with a string lie "...?$Filter=Title eq 'Test'".
+ * @returns {string} An URL with a string like "...?$Filter=Title eq 'Test'".
  */
 SpRestApi.appendFilters = function (url, filters) {
     if (!filters) { return url; }
@@ -264,7 +264,7 @@ SpRestApi.appendFilters = function (url, filters) {
  * @param {string} url - The base URL to which we need to append the string.
  *      May contain other query string parameters.
  * @param {string|Array.<string>} expand - Which columns to expand
- * @returns {string} An URL with a string lie "...?$Filter=Title eq 'Test'".
+ * @returns {string} An URL with a string like "...?$expand=LookupField".
  */
 SpRestApi.appendExpand = function (url, expand) {
     if (!expand) { return url; }
