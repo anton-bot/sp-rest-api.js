@@ -390,6 +390,8 @@ SpRestApi.prototype.getItem = function (itemId) {
 
     var url = this.options.siteUrl +
         this.options.urls.item.format(this.options.listTitle, itemId);
+    url = SpRestApi.appendSelectQueryString(url, this.options.select);
+    url = SpRestApi.appendExpand(url,this.options.expand);
     this.loadUrl(url, 'GET', this.options.onsuccess, this.options.onerror);
 };
 
