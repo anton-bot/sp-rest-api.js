@@ -1,3 +1,5 @@
+### This project is no longer in active development. Open an issue if you'd like to become a maintainer.
+
 # sp-rest-api.js
 
 ## A lightweight JS library to work with SharePoint lists using the SharePoint REST API.
